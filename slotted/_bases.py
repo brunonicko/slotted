@@ -5,6 +5,21 @@ from types import GetSetDescriptorType, MemberDescriptorType
 from six import with_metaclass, iteritems
 from typing import Any, Dict, Type, Tuple, AnyStr
 
+__all__ = [
+    "SlotsTuple",
+    "AllSlotsDict",
+    "StateDict",
+    "privatize_name",
+    "update_slots_dict",
+    "scrape_slots",
+    "scrape_all_slots",
+    "make_slotted_class",
+    "get_state",
+    "set_state",
+    "SlottedMeta",
+    "Slotted"
+]
+
 SlotsTuple = Tuple[str, ...]
 AllSlotsDict = Dict[str, Dict[Type, MemberDescriptorType]]
 StateDict = Dict[str, Dict[Type, Any]]
@@ -49,7 +64,7 @@ def scrape_all_slots(base):
     return b_all_slots
 
 
-def _make_slotted_cls(mcs, name, bases, dct):
+def make_slotted_class(mcs, name, bases, dct):
     # type: (Type[SlottedMeta], str, Tuple[Type, ...], Dict[str, Any]) -> SlottedMeta
     """Make slotted class."""
 
@@ -118,7 +133,7 @@ def set_state(obj, state):
 class SlottedMeta(type):
     """Enforces usage of '__slots__'."""
 
-    __new__ = staticmethod(_make_slotted_cls)
+    __new__ = staticmethod(make_slotted_class)
 
 
 class Slotted(with_metaclass(SlottedMeta, object)):
