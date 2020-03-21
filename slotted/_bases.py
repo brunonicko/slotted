@@ -5,21 +5,6 @@ from types import GetSetDescriptorType, MemberDescriptorType
 from six import with_metaclass, iteritems
 from typing import Any, Dict, Type, Tuple, AnyStr
 
-__all__ = [
-    "SlotsTuple",
-    "AllSlotsDict",
-    "StateDict",
-    "privatize_name",
-    "update_slots_dict",
-    "scrape_slots",
-    "scrape_all_slots",
-    "make_slotted_class",
-    "get_state",
-    "set_state",
-    "SlottedMeta",
-    "Slotted"
-]
-
 SlotsTuple = Tuple[str, ...]
 AllSlotsDict = Dict[str, Dict[Type, MemberDescriptorType]]
 StateDict = Dict[str, Dict[Type, Any]]
@@ -33,7 +18,7 @@ def privatize_name(cls_name, name):
     return name
 
 
-def update_slots_dict(slots, slots_update):
+def update_slots(slots, slots_update):
     # type: (AllSlotsDict, AllSlotsDict) -> None
     """Update 'all slots' dictionary in place."""
     for name, members in iteritems(slots_update):
@@ -58,9 +43,9 @@ def scrape_all_slots(base):
     b_all_slots = defaultdict(dict)
     for b_base in reversed(base.__mro__):
         if b_base is base:
-            update_slots_dict(b_all_slots, scrape_slots(base))
+            update_slots(b_all_slots, scrape_slots(base))
         else:
-            update_slots_dict(b_all_slots, scrape_all_slots(b_base))
+            update_slots(b_all_slots, scrape_all_slots(b_base))
     return b_all_slots
 
 
@@ -103,7 +88,7 @@ def make_slotted_class(mcs, name, bases, dct):
             base_all_slots = getattr(base, "__all_slots__")
         else:
             base_all_slots = scrape_all_slots(base)
-        update_slots_dict(__all_slots__, base_all_slots)
+        update_slots(__all_slots__, base_all_slots)
 
     return cls
 
