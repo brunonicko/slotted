@@ -1,0 +1,3 @@
+slotted
+six>=1.13.0
+typing>=3.7.4.1
