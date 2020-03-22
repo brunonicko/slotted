@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABCMeta as _ABCMeta
+from types import MemberDescriptorType as _MemberDescriptorType
+from six import iteritems
 
 try:
     import collections.abc as _collections
@@ -11,10 +13,13 @@ else:
     # noinspection PyCompatibility
     from collections.abc import *
 
+from typing import Any as _Any
 from typing import Dict as _Dict
 from typing import Type as _Type
 from typing import Set as _Set
+from typing import Tuple as _Tuple
 
+from ._bases import privatize_name as _privatize_name
 from ._bases import SlottedMeta as _SlottedMeta
 from ._bases import Slotted as _Slotted
 
@@ -39,6 +44,24 @@ for _cls_name in _collections_all:
     _classes.add(_cls)
 
 
+def _extract_dict(base):
+    # type: (_Type) -> _Tuple[_Dict[str, _Any], _Dict[str, _Any]]
+    slots = set(
+        _privatize_name(base.__name__, slot) for slot in getattr(base, "__slots__", ())
+    )
+    base_dict = {}
+    overrides = {}
+    for name, value in iteritems(base.__dict__):
+        if name in slots:
+            if isinstance(value, _MemberDescriptorType):
+                if value.__objclass__ is base and value.__name__ == name:
+                    continue
+            overrides[name] = value
+        else:
+            base_dict[name] = value
+    return base_dict, overrides
+
+
 def _convert_meta(source):
     # type: (_Type) -> _Type
     """Convert a metaclass to a slotted metaclass."""
@@ -54,10 +77,12 @@ def _convert_meta(source):
     source_name = source.__name__
     target_name = "Slotted{}".format(source_name)
     target_bases = tuple(target_bases)
-    target_dct = dict(source.__dict__)
+    target_dct, overrides = _extract_dict(source)
     target_dct["__module__"] = __name__
 
     target = type(target_name, target_bases, target_dct)
+    for name, value in iteritems(overrides):
+        type.__setattr__(target, name, value)
     _cache[source] = target
 
     if source_name in _collections_all:
@@ -82,11 +107,13 @@ def _convert(source):
     source_name = source.__name__
     target_name = "Slotted{}".format(source_name)
     target_bases = tuple(target_bases)
-    target_dct = dict(source.__dict__)
+    target_dct, overrides = _extract_dict(source)
     target_dct.pop("__dict__", None)
     target_dct["__module__"] = __name__
 
     target = meta(target_name, target_bases, target_dct)
+    for name, value in iteritems(overrides):
+        type.__setattr__(target, name, value)
     _cache[source] = target
 
     if target.__dict__.get("__dict__") is not None:
