@@ -2,7 +2,7 @@
 
 from abc import ABCMeta as _ABCMeta
 from types import MemberDescriptorType as _MemberDescriptorType
-from six import iteritems
+from six import iteritems as _iteritems
 
 try:
     import collections.abc as _collections
@@ -51,7 +51,7 @@ def _extract_dict(base):
     )
     base_dict = {}
     overrides = {}
-    for name, value in iteritems(base.__dict__):
+    for name, value in _iteritems(base.__dict__):
         if name in slots:
             if isinstance(value, _MemberDescriptorType):
                 if value.__objclass__ is base and value.__name__ == name:
@@ -81,7 +81,7 @@ def _convert_meta(source):
     target_dct["__module__"] = __name__
 
     target = type(target_name, target_bases, target_dct)
-    for name, value in iteritems(overrides):
+    for name, value in _iteritems(overrides):
         type.__setattr__(target, name, value)
     _cache[source] = target
 
@@ -112,7 +112,7 @@ def _convert(source):
     target_dct["__module__"] = __name__
 
     target = meta(target_name, target_bases, target_dct)
-    for name, value in iteritems(overrides):
+    for name, value in _iteritems(overrides):
         type.__setattr__(target, name, value)
     _cache[source] = target
 
