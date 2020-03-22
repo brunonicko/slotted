@@ -1,9 +1,13 @@
+# -*- coding: utf-8 -*-
+
 import unittest
+import six
 
 __all__ = ["TestBases"]
 
 
 class TestBases(unittest.TestCase):
+    """Tests for '_base' module."""
 
     def test_privatize_name(self):
         from slotted._bases import privatize_name
@@ -15,8 +19,8 @@ class TestBases(unittest.TestCase):
         self.assertEqual(privatize_name("_Foo", "__bar"), "_Foo__bar")
         self.assertEqual(privatize_name("__Foo", "__bar"), "_Foo__bar")
 
-    def test_update_slots(self):
-        from slotted._bases import update_slots
+    def test_update_members(self):
+        from slotted._bases import update_members
 
         class Foo(object):
             __slots__ = ("foo", "bar")
@@ -24,18 +28,94 @@ class TestBases(unittest.TestCase):
         class Bar(object):
             __slots__ = ("bar", "foobar")
 
-        slots = {"foo": {Foo: Foo.foo}, "bar": {Foo: Foo.bar}}
+        members = {"foo": {Foo: Foo.foo}, "bar": {Foo: Foo.bar}}
         update = {"bar": {Bar: Bar.bar}, "foobar": {Bar: Bar.foobar}}
-
-        update_slots(slots, update)
+        update_members(members, update)
         expected = {
             "foo": {Foo: Foo.foo},
             "bar": {Foo: Foo.bar, Bar: Bar.bar},
-            "foobar": {Bar: Bar.foobar}
+            "foobar": {Bar: Bar.foobar},
         }
+        self.assertEqual(members, expected)
 
-        self.assertEqual(slots, expected)
+    def test_scrape_members(self):
+        from slotted._bases import scrape_members
+
+        class Foo(object):
+            __slots__ = ("foo",)
+
+        class Bar(Foo):
+            __slots__ = ("foo", "_bar")
+
+        members = scrape_members(Bar)
+        expected = {"foo": {Bar: Bar.foo}, "_bar": {Bar: Bar._bar}}
+        self.assertEqual(members, expected)
+
+    def test_scrape_all_members(self):
+        from slotted._bases import scrape_all_members
+
+        class Foo(object):
+            __slots__ = ("foo",)
+
+        class Bar(Foo):
+            __slots__ = ("foo", "_bar")
+
+        members = scrape_all_members(Bar)
+        expected = {"foo": {Foo: Foo.foo, Bar: Bar.foo}, "_bar": {Bar: Bar._bar}}
+        self.assertEqual(members, expected)
+
+    def test_slotted_meta(self):
+        from slotted._bases import SlottedMeta
+
+        class Foo(object):
+            __slots__ = ("foo", "foobar")
+
+        class Bar(six.with_metaclass(SlottedMeta, Foo)):
+            __slots__ = ("foo", "bar")
+
+        Foo.foobar = 1
+
+        class FooBar(Bar, Foo):
+            pass
+
+        self.assertTrue(hasattr(FooBar, "__slots__"))
+        self.assertEqual(FooBar.__slots__, ())
+        self.assertEqual(Bar.__slots__, ("foo", "bar"))
+        expected = {
+            "foo": {Foo: Foo.__dict__["foo"], Bar: Bar.__dict__["foo"],},
+            "bar": {Bar: Bar.__dict__["bar"],},
+        }
+        self.assertEqual(Bar.__members__, expected)
+
+        class BarBar(object):
+            pass
+
+        self.assertRaises(TypeError, SlottedMeta, ("FooBarBar", (BarBar, FooBar), {}))
+
+    def test_slotted(self):
+        from slotted._bases import Slotted
+
+        class Foo(object):
+            __slots__ = ("foo", "foobar")
+
+        class Bar(Slotted, Foo):
+            __slots__ = ("foo", "bar")
+
+        Foo.foobar = 1
+
+        bar = Bar()
+        bar.foo = 2
+        bar.bar = 3
+        Foo.foo.__set__.__call__(bar, 4)
+
+        new_bar = Bar()
+        new_bar.__setstate__(bar.__getstate__())
+
+        self.assertEqual(bar.foo, new_bar.foo)
+        self.assertEqual(Foo.foo.__get__(bar), Foo.foo.__get__(new_bar))
+        self.assertEqual(bar.bar, new_bar.bar)
+        self.assertEqual(bar.foobar, new_bar.foobar)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
