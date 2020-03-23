@@ -17,10 +17,10 @@ class TestCollections(unittest.TestCase):
 
     def test_all(self):
         from slotted._bases import SlottedMeta, Slotted
-        from slotted import _collections as slotted_collections
-        from slotted._collections import __all__ as slotted_collections_all
-
-        for name in slotted_collections_all:
+        from slotted import _abc as slotted_collections
+        from slotted._abc import __all__ as slotted_collections_all
+        not_converted = {"SlottedABCMeta", "SlottedABC"}
+        for name in set(slotted_collections_all).difference(not_converted):
             self.assertTrue(name.startswith("Slotted"))
             self.assertTrue(hasattr(slotted_collections, name))
 
