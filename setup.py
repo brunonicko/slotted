@@ -10,7 +10,7 @@ setuptools.setup(
     author_email="brunonicko@gmail.com",
     description="Enforces usage of '__slots__' for python classes",
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     url="https://github.com/brunonicko/slotted",
     packages=setuptools.find_packages(),
     install_requires=["six", "typing"],
