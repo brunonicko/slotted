@@ -1,17 +1,17 @@
 Slotted
 =======
-Enforces usage of `__slots__` for python classes and provides pickling capabilities.
+Enforces usage of ``__slots__`` for python classes and provides pickling capabilities.
 
 Examples
 --------
-When defining a `Slotted` class with no `__slots__` declaration, it assumes it has empty
-slots, which is equivalent of declaring `__slots__ = ()`.
+When defining a ``Slotted`` class with no ``__slots__`` declaration, it assumes it has
+empty slots, which is equivalent of declaring ``__slots__ = ()``.
 
 .. code:: python
 
     >>> from slotted import Slotted
     >>> class Foo(Slotted):
-    ...     pass  # implicit declaration of `__slots__ = ()`
+    ...     pass  # implicit declaration of __slots__ = ()
     ...
     >>> foo = Foo()
     >>> foo.bar = 1
@@ -35,7 +35,7 @@ Slotted classes have pickling support:
     (1, 2)
 
 Slotted classes can be mixed with regular classes as long as they and all of their bases
-implement `__slots__`.
+implement ``__slots__``.
 
 .. code:: python
 
@@ -47,8 +47,8 @@ implement `__slots__`.
     ...
     >>> foo = Foo()
 
-If any non-`Slotted` class anywhere in the chain does not implement `__slots__`, a
-`TypeError` exception is raised.
+If any non-``Slotted`` class anywhere in the chain does not implement ``__slots__``, a
+``TypeError`` exception is raised.
 
 .. code:: python
 
@@ -60,7 +60,7 @@ If any non-`Slotted` class anywhere in the chain does not implement `__slots__`,
     ...
     TypeError: base 'Bar' does not enforce '__slots__'
 
-`Slotted` behavior can also be achieved by using the `SlottedMeta` metaclass.
+``Slotted`` behavior can also be achieved by using the ``SlottedMeta`` metaclass.
 
 .. code:: python
 
@@ -68,16 +68,16 @@ If any non-`Slotted` class anywhere in the chain does not implement `__slots__`,
     >>> from six import add_metaclass
     >>> @add_metaclass(SlottedMeta)
     ... class Foo(object):
-    ...     pass  # implicit declaration of `__slots__ = ()`
+    ...     pass  # implicit declaration of __slots__ = ()
     ...
     >>> foo = Foo()
     >>> foo.bar = 1
     Traceback (most recent call last):
     AttributeError: 'Foo' object has no attribute 'bar'
 
-In Python 3, `Slotted` can be mixed with `collections.abc` classes without any issues.
-However, those classes do not define slots in Python 2. In order to work around that
-limitation, you can utilize automatically converted `SlottedABC` classes like so:
+In Python 3, ``Slotted`` can be mixed with ``collections.abc`` classes without any
+issues. However, those classes do not define slots in Python 2. In order to work around
+that limitation, you can utilize automatically converted ``SlottedABC`` classes like so:
 
 .. code:: python
 
