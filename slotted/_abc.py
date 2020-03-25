@@ -19,7 +19,37 @@ from ._bases import privatize_name
 from ._bases import SlottedMeta
 from ._bases import Slotted
 
-__all__ = ["SlottedABCMeta", "SlottedABC"]
+__all__ = [
+    "SlottedABC",
+    "SlottedABCMeta",
+    "SlottedCallable",
+    "SlottedContainer",
+    "SlottedHashable",
+    "SlottedIterable",
+    "SlottedIterator",
+    "SlottedMapping",
+    "SlottedMappingView",
+    "SlottedMutableMapping",
+    "SlottedMutableSequence",
+    "SlottedMutableSet",
+    "SlottedSequence",
+    "SlottedSet",
+    "SlottedSized"
+]
+
+SlottedCallable = collections_abc.Callable
+SlottedContainer = collections_abc.Container
+SlottedHashable = collections_abc.Hashable
+SlottedIterable = collections_abc.Iterable
+SlottedIterator = collections_abc.Iterator
+SlottedMapping = collections_abc.Mapping
+SlottedMappingView = collections_abc.MappingView
+SlottedMutableMapping = collections_abc.MutableMapping
+SlottedMutableSequence = collections_abc.MutableSequence
+SlottedMutableSet = collections_abc.MutableSet
+SlottedSequence = collections_abc.Sequence
+SlottedSet = collections_abc.Set
+SlottedSized = collections_abc.Sized
 
 
 class SlottedABCMeta(SlottedMeta, ABCMeta):
@@ -121,7 +151,7 @@ def convert(source):
         raise AssertionError("class '{}' has a '__dict__'".format(target_name))
 
     source.register(target)
-    if source_name in _ABC_ALL:
+    if source_name in _ABC_ALL and target_name not in __all__:
         __all__.append(target_name)
     return target
 

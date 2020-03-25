@@ -7,7 +7,7 @@ __all__ = ["TestBases"]
 
 
 class TestBases(unittest.TestCase):
-    """Tests for '_base' module."""
+    """Tests for '_bases' module."""
 
     def test_privatize_name(self):
         from slotted._bases import privatize_name

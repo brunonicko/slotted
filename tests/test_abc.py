@@ -17,17 +17,18 @@ class TestCollections(unittest.TestCase):
 
     def test_all(self):
         from slotted._bases import SlottedMeta, Slotted
-        from slotted import _abc as slotted_collections
-        from slotted._abc import __all__ as slotted_collections_all
+        from slotted import _abc as slotted_abc
+        from slotted._abc import __all__ as slotted_abc_all
         not_converted = {"SlottedABCMeta", "SlottedABC"}
-        for name in set(slotted_collections_all).difference(not_converted):
+
+        for name in set(slotted_abc_all).difference(not_converted):
             self.assertTrue(name.startswith("Slotted"))
-            self.assertTrue(hasattr(slotted_collections, name))
+            self.assertTrue(hasattr(slotted_abc, name))
 
             original_name = name[len("Slotted"):]
             self.assertIn(original_name, collections_all)
 
-            cls = getattr(slotted_collections, name)
+            cls = getattr(slotted_abc, name)
             self.assertIsInstance(cls, ABCMeta)
             self.assertIsInstance(cls, SlottedMeta)
             self.assertTrue(issubclass(cls, Slotted))
