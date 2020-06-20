@@ -96,7 +96,20 @@ class TestBases(unittest.TestCase):
         from slotted._bases import Slotted
 
         class Foo(object):
-            __slots__ = ("foo", "foobar")
+            __slots__ = ("foo", "__foobar")
+
+            def __init__(self):
+                self.__foobar = None
+
+            @property
+            def foobar(self):
+                if self.__foobar is None:
+                    raise ValueError("'__foobar' never set")
+                return self.__foobar
+
+            @foobar.setter
+            def foobar(self, value):
+                self.__foobar = value
 
         class Bar(Slotted, Foo):
             __slots__ = ("foo", "bar")

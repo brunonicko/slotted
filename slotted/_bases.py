@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from collections import defaultdict
 from types import GetSetDescriptorType, MemberDescriptorType
 from six import with_metaclass, iteritems
 from typing import Any, Dict, Type, Tuple, AnyStr
@@ -32,22 +31,24 @@ def scrape_members(base):
     """Scrape base for members (shallow)."""
     if base is object:
         return {}
-    base_members = defaultdict(dict)
+    base_members = {}
     for name in base.__slots__:
+        private_name = privatize_name(base.__name__, name)
         try:
-            member = base.__dict__[privatize_name(base.__name__, name)]
+            member = base.__dict__[private_name]
         except KeyError:
             continue
         if isinstance(member, MemberDescriptorType):
-            if member.__objclass__ is base and member.__name__ == name:
-                base_members[name][base] = member
+            if member.__objclass__ is base and member.__name__ == private_name:
+                base_members.setdefault(private_name, {})
+                base_members[private_name][base] = member
     return base_members
 
 
 def scrape_all_members(base):
     # type: (Type) -> MembersDict
     """Scrape base for all members (deep)."""
-    all_members = defaultdict(dict)
+    all_members = {}
     for base_base in reversed(base.__mro__):
         if base_base is base:
             update_members(all_members, scrape_members(base))
@@ -59,13 +60,14 @@ def scrape_all_members(base):
 def get_state(obj):
     # type: (Slotted) -> StateDict
     """Get state of a slotted object for pickling purposes."""
-    state = defaultdict(dict)
+    state = {}
     for name, members in iteritems(type(obj).__members__):
         for base, member in iteritems(members):
             try:
                 value = member.__get__(obj, base)
             except AttributeError:
                 continue
+            state.setdefault(name, {})
             state[name][base] = value
     return state
 
