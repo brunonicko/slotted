@@ -1,13 +1,13 @@
 Slotted
 =======
 .. image:: https://github.com/brunonicko/slotted/workflows/MyPy/badge.svg
-    :target: http://mypy-lang.org/
+    :target: https://github.com/brunonicko/slotted/actions?query=workflow%3AMyPy
 
 .. image:: https://github.com/brunonicko/slotted/workflows/Lint/badge.svg
-    :target: https://flake8.pycqa.org/en/stable/
+    :target: https://github.com/brunonicko/slotted/actions?query=workflow%3ALint
 
 .. image:: https://github.com/brunonicko/slotted/workflows/Tests/badge.svg
-    :target: https://docs.pytest.org/en/stable/
+    :target: https://github.com/brunonicko/slotted/actions?query=workflow%3ATests
 
 .. image:: https://badge.fury.io/py/slotted.svg
     :target: https://pypi.org/project/slotted/
