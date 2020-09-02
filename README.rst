@@ -10,7 +10,7 @@ Slotted
     :target: https://docs.pytest.org/en/stable/
 
 .. image:: https://badge.fury.io/py/slotted.svg
-    :target: https://badge.fury.io/py/slotted
+    :target: https://pypi.org/project/slotted/
 
 Enforces usage of ``__slots__`` for python classes and provides pickling capabilities.
 
