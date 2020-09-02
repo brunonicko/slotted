@@ -4,10 +4,10 @@ Slotted
     :target: http://mypy-lang.org/
 
 .. image:: https://github.com/brunonicko/slotted/workflows/Lint/badge.svg
-    :target: https://docs.pytest.org/en/stable/
+    :target: https://flake8.pycqa.org/en/stable/
 
 .. image:: https://github.com/brunonicko/slotted/workflows/Tests/badge.svg
-    :target: https://flake8.pycqa.org/en/stable/
+    :target: https://docs.pytest.org/en/stable/
 
 .. image:: https://badge.fury.io/py/slotted.svg
     :target: https://badge.fury.io/py/slotted
