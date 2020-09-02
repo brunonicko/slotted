@@ -1,5 +1,11 @@
 Slotted
 =======
+.. image:: https://github.com/brunonicko/slotted/workflows/MyPy/badge.svg
+
+.. image:: https://github.com/brunonicko/slotted/workflows/Lint/badge.svg
+
+.. image:: https://github.com/brunonicko/slotted/workflows/Tests/badge.svg
+
 Enforces usage of ``__slots__`` for python classes and provides pickling capabilities.
 
 Examples
