@@ -2,7 +2,7 @@
 
 from types import GetSetDescriptorType, MemberDescriptorType
 from six import with_metaclass, iteritems
-from typing import Any, Dict, Type, Tuple, AnyStr
+from typing import Any, Dict, Type, Tuple, cast
 
 SlotsTuple = Tuple[str, ...]
 MembersDict = Dict[str, Dict[Type, MemberDescriptorType]]
@@ -10,7 +10,7 @@ StateDict = Dict[str, Dict[Type, Any]]
 
 
 def privatize_name(cls_name, name):
-    # type: (str, AnyStr) -> str
+    # type: (str, str) -> str
     """Privatize an attribute name if necessary."""
     if name.startswith("__") and not name.endswith("__"):
         return "_{}{}".format(cls_name.lstrip("_"), name)
@@ -31,9 +31,9 @@ def scrape_members(base):
     """Scrape base for members (shallow)."""
     if base is object:
         return {}
-    base_members = {}
+    base_members = {}  # type: MembersDict
     for name in base.__slots__:
-        private_name = privatize_name(base.__name__, name)
+        private_name = privatize_name(base.__name__, cast(str, name))
         try:
             member = base.__dict__[private_name]
         except KeyError:
@@ -48,7 +48,7 @@ def scrape_members(base):
 def scrape_all_members(base):
     # type: (Type) -> MembersDict
     """Scrape base for all members (deep)."""
-    all_members = {}
+    all_members = {}  # type: MembersDict
     for base_base in reversed(base.__mro__):
         if base_base is base:
             update_members(all_members, scrape_members(base))
@@ -60,7 +60,7 @@ def scrape_all_members(base):
 def get_state(obj):
     # type: (Slotted) -> StateDict
     """Get state of a slotted object for pickling purposes."""
-    state = {}
+    state = {}  # type: StateDict
     for name, members in iteritems(type(obj).__members__):
         for base, member in iteritems(members):
             try:
@@ -80,36 +80,38 @@ def set_state(obj, state):
             member = base.__dict__[name]
             if isinstance(member, MemberDescriptorType):
                 if member.__objclass__ is base and member.__name__ == name:
-                    member.__set__.__call__(obj, value)
-
-
-def _make_slotted_class(mcs, name, bases, dct):
-    # type: (Type[SlottedMeta], str, Tuple[Type, ...], Dict[str, Any]) -> SlottedMeta
-    """Make slotted class."""
-    for base in bases:
-        if isinstance(base.__dict__.get("__dict__"), GetSetDescriptorType):
-            raise TypeError(
-                "base '{}' does not enforce '__slots__'".format(base.__name__)
-            )
-    dct = dict(dct)
-    dct["__slots__"] = tuple(dct.get("__slots__", ()))
-    return super(SlottedMeta, mcs).__new__(mcs, name, bases, dct)
+                    getattr(member, "__set__")(obj, value)
 
 
 class SlottedMeta(type):
     """Enforces usage of '__slots__'."""
 
-    __new__ = staticmethod(_make_slotted_class)
+    @staticmethod
+    def __new__(
+        mcs,  # type: Type[SlottedMeta]
+        name,  # type: str
+        bases,  # type: Tuple[Type, ...]
+        dct,  # type: Dict[str, Any]
+    ):
+        # type: (...) -> SlottedMeta
+        """Make slotted class."""
+        for base in bases:
+            if isinstance(base.__dict__.get("__dict__"), GetSetDescriptorType):
+                raise TypeError(
+                    "base '{}' does not enforce '__slots__'".format(base.__name__)
+                )
+        dct = dict(dct)
+        dct["__slots__"] = tuple(dct.get("__slots__", ()))
+        return cast(SlottedMeta, super(SlottedMeta, mcs).__new__(mcs, name, bases, dct))
 
     @property
     def __members__(cls):
         # type: () -> MembersDict
-        members = {}
+        members = {}  # type: MembersDict
         for base in reversed(cls.__mro__):
             if base is cls:
                 base_members = scrape_members(cls)
             elif isinstance(base, SlottedMeta):
-                base = base  # type: SlottedMeta
                 base_members = base.__members__
             else:
                 base_members = scrape_all_members(base)

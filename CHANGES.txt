@@ -1,0 +1,5 @@
+Revision History
+================
+
+1.0.0, 2020-09-01
+ * First production-ready release.

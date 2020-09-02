@@ -2,22 +2,12 @@
 
 from abc import ABCMeta
 from types import MemberDescriptorType
-from six import with_metaclass, iteritems
 
-try:
-    import collections.abc as collections_abc
-except ImportError:
-    import collections as collections_abc
+from six import iteritems, with_metaclass
+from six.moves import collections_abc
+from typing import Any, Dict, List, Set, Tuple, Type, Union, cast
 
-from typing import Any
-from typing import Dict
-from typing import Type
-from typing import Set
-from typing import Tuple
-
-from ._bases import privatize_name
-from ._bases import SlottedMeta
-from ._bases import Slotted
+from ._bases import Slotted, SlottedMeta, privatize_name
 
 __all__ = [
     "SlottedABC",
@@ -25,8 +15,10 @@ __all__ = [
     "SlottedCallable",
     "SlottedContainer",
     "SlottedHashable",
+    "SlottedItemsView",
     "SlottedIterable",
     "SlottedIterator",
+    "SlottedKeysView",
     "SlottedMapping",
     "SlottedMappingView",
     "SlottedMutableMapping",
@@ -34,14 +26,17 @@ __all__ = [
     "SlottedMutableSet",
     "SlottedSequence",
     "SlottedSet",
-    "SlottedSized"
+    "SlottedSized",
+    "SlottedValuesView",
 ]
 
 SlottedCallable = collections_abc.Callable
 SlottedContainer = collections_abc.Container
 SlottedHashable = collections_abc.Hashable
+SlottedItemsView = collections_abc.ItemsView
 SlottedIterable = collections_abc.Iterable
 SlottedIterator = collections_abc.Iterator
+SlottedKeysView = collections_abc.KeysView
 SlottedMapping = collections_abc.Mapping
 SlottedMappingView = collections_abc.MappingView
 SlottedMutableMapping = collections_abc.MutableMapping
@@ -50,6 +45,7 @@ SlottedMutableSet = collections_abc.MutableSet
 SlottedSequence = collections_abc.Sequence
 SlottedSet = collections_abc.Set
 SlottedSized = collections_abc.Sized
+SlottedValuesView = collections_abc.ValuesView
 
 
 class SlottedABCMeta(SlottedMeta, ABCMeta):
@@ -72,7 +68,10 @@ for cls_name in _ABC_ALL:
         continue
     _CLASSES.add(cls)
 
-_CACHE = {object: SlottedABC, ABCMeta: SlottedABCMeta}  # type: Dict[Type, Type]
+_CACHE = {
+    object: SlottedABC,
+    ABCMeta: SlottedABCMeta,
+}  # type: Dict[Type[Any], Union[SlottedABCMeta, Type[SlottedABCMeta]]]
 
 
 def extract_dict(base):
@@ -101,19 +100,19 @@ def convert_meta(source):
     except KeyError:
         pass
 
-    target_bases = []
+    target_bases_list = []  # type: List[Union[SlottedABCMeta, Type[SlottedABCMeta]]]
     for source_base in source.__bases__:
-        target_bases.append(convert_meta(source_base))
+        target_bases_list.append(cast(SlottedABCMeta, convert_meta(source_base)))
 
     source_name = source.__name__
     target_name = "Slotted{}".format(source_name)
-    target_bases = tuple(target_bases)
+    target_bases = tuple(target_bases_list)
     target_dct, overrides = extract_dict(source)
     target_dct["__module__"] = __name__
 
-    target = type(target_name, target_bases, target_dct)
+    target = SlottedABCMeta(target_name, target_bases, target_dct)
     for name, value in iteritems(overrides):
-        type.__setattr__(target, name, value)
+        type.__setattr__(cast(type, target), name, value)
     _CACHE[source] = target
 
     if source_name in _ABC_ALL:
@@ -122,7 +121,7 @@ def convert_meta(source):
 
 
 def convert(source):
-    # type: (ABCMeta) -> SlottedABCMeta
+    # type: (ABCMeta) -> Union[SlottedABCMeta, Type[SlottedABCMeta]]
     """Convert an ABC-based class to an SlottedABC-based class."""
     try:
         return _CACHE[source]
@@ -131,13 +130,13 @@ def convert(source):
 
     meta = convert_meta(type(source))
 
-    target_bases = []
+    target_bases_list = []  # type: List[Union[SlottedABCMeta, Type[SlottedABCMeta]]]
     for source_base in source.__bases__:
-        target_bases.append(convert(source_base))
+        target_bases_list.append(convert(cast(ABCMeta, source_base)))
 
     source_name = source.__name__
     target_name = "Slotted{}".format(source_name)
-    target_bases = tuple(target_bases)
+    target_bases = tuple(target_bases_list)
     target_dct, overrides = extract_dict(source)
     target_dct.pop("__dict__", None)
     target_dct["__module__"] = __name__
@@ -158,5 +157,5 @@ def convert(source):
 
 # Convert all classes
 for cls in _CLASSES:
-    converted = convert(cls)
+    converted = convert(cast(ABCMeta, cls))
     locals()[converted.__name__] = converted
