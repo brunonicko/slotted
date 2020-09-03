@@ -17,7 +17,7 @@ Enforces usage of ``__slots__`` for python classes and provides pickling capabil
 Examples
 --------
 When defining a ``Slotted`` class with no ``__slots__`` declaration, it assumes it has
-empty slots, which is equivalent of declaring ``__slots__ = ()``.
+empty slots, which is equivalent to declaring ``__slots__ = ()``.
 
 .. code:: python
 
