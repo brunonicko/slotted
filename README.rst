@@ -22,6 +22,7 @@ empty slots, which is equivalent to declaring ``__slots__ = ()``.
 .. code:: python
 
     >>> from slotted import Slotted
+    
     >>> class Foo(Slotted):
     ...     pass  # implicit declaration of __slots__ = ()
     ...
@@ -36,6 +37,7 @@ Slotted classes have pickling support:
 
     >>> from slotted import Slotted
     >>> from pickle import dumps, loads
+    
     >>> class Foo(Slotted):
     ...     __slots__ = ("bar", "foobar")
     ...
@@ -52,6 +54,7 @@ implement ``__slots__``.
 .. code:: python
 
     >>> from slotted import Slotted
+    
     >>> class Bar(object):
     ...     __slots__ = ("bar",)
     >>> class Foo(Bar, Slotted):
@@ -65,11 +68,13 @@ If any non-``Slotted`` class anywhere in the chain does not implement ``__slots_
 .. code:: python
 
     >>> from slotted import Slotted
+    
     >>> class Bar(object):
     ...     pass
     >>> class Foo(Bar, Slotted):
     ...     __slots__ = ("foo",)
     ...
+    Traceback (most recent call last):
     TypeError: base 'Bar' does not enforce '__slots__'
 
 ``Slotted`` behavior can also be achieved by using the ``SlottedMeta`` metaclass.
@@ -77,9 +82,9 @@ If any non-``Slotted`` class anywhere in the chain does not implement ``__slots_
 .. code:: python
 
     >>> from slotted import SlottedMeta
-    >>> from six import add_metaclass
-    >>> @add_metaclass(SlottedMeta)
-    ... class Foo(object):
+    >>> from six import with_metaclass
+    
+    >>> class Foo(with_metaclass(SlottedMeta, object)):
     ...     pass  # implicit declaration of __slots__ = ()
     ...
     >>> foo = Foo()
@@ -95,6 +100,7 @@ that limitation, you can utilize automatically converted ``SlottedABC`` classes 
 
     >>> from collections import Mapping
     >>> from slotted import SlottedMapping
+    
     >>> issubclass(SlottedMapping, Mapping)
     True
     >>> class FooMapping(SlottedMapping):
