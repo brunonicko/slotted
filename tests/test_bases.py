@@ -100,7 +100,9 @@ def test_slotted_meta():
     assert Bar.__slots__ == ("foo", "bar")
     expected = {
         "foo": {Foo: Foo.__dict__["foo"], Bar: Bar.__dict__["foo"]},
-        "bar": {Bar: Bar.__dict__["bar"], },
+        "bar": {
+            Bar: Bar.__dict__["bar"],
+        },
     }
     assert Bar.__members__ == expected
 
