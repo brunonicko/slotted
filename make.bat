@@ -59,8 +59,8 @@ rem # Stop if there are Python syntax errors or undefined names.
 flake8 .\slotted --count --select=E9,F63,F7,F82 --show-source --statistics
 flake8 .\tests --count --select=E9,F63,F7,F82 --show-source --statistics
 rem # Exit-zero treats all errors as warnings.
-flake8 .\slotted --count --exit-zero --ignore=F403,F401,W503,C901,E203 --max-complexity=10 --max-line-length=88 --statistics
-flake8 .\tests --count --exit-zero --ignore=F403,F401,W503,C901,E203 --max-complexity=10 --max-line-length=88 --statistics
+flake8 .\slotted --count --exit-zero --ignore=F403,F401,E203 --max-complexity=10 --max-line-length=88 --statistics
+flake8 .\tests --count --exit-zero --ignore=F403,F401,E203 --max-complexity=10 --max-line-length=88 --statistics
 goto end
 
 :end
