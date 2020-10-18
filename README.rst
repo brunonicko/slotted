@@ -105,13 +105,17 @@ that limitation, you can utilize automatically converted ``SlottedABC`` classes 
     True
     >>> class FooMapping(SlottedMapping):
     ...     __slots__ = ("_d",)
+
     ...     def __init__(self):
     ...         self._d = {"a": 1, "b": 2}
+
     ...     def __getitem__(self, item):
     ...         return self._d[item]
+
     ...     def __iter__(self):
     ...         for key in self._d:
     ...             yield key
+
     ...     def __len__(self):
     ...         return len(self._d)
     ...

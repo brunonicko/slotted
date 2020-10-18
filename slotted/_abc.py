@@ -2,12 +2,15 @@
 
 from abc import ABCMeta
 from types import MemberDescriptorType
+from typing import TYPE_CHECKING, cast
 
 from six import iteritems, with_metaclass
 from six.moves import collections_abc
-from typing import Any, Dict, List, Set, Tuple, Type, Union, cast
 
 from ._bases import Slotted, SlottedMeta, privatize_name
+
+if TYPE_CHECKING:
+    from typing import Any, Dict, List, Set, Tuple, Type, Union
 
 __all__ = [
     "SlottedABC",
@@ -147,7 +150,8 @@ def convert(source):
     _CACHE[source] = target
 
     if target.__dict__.get("__dict__") is not None:
-        raise AssertionError("class '{}' has a '__dict__'".format(target_name))
+        error = "class '{}' has a '__dict__'".format(target_name)
+        raise AssertionError(error)
 
     source.register(target)
     if source_name in _ABC_ALL and target_name not in __all__:

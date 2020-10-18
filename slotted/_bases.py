@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from types import GetSetDescriptorType, MemberDescriptorType
-from six import with_metaclass, iteritems
-from typing import Any, Dict, Type, Tuple, cast
+from typing import TYPE_CHECKING, cast
 
-SlotsTuple = Tuple[str, ...]
-MembersDict = Dict[str, Dict[Type, MemberDescriptorType]]
-StateDict = Dict[str, Dict[Type, Any]]
+from six import iteritems, with_metaclass
+
+if TYPE_CHECKING:
+    from typing import Any, Dict, Tuple, Type
+
+    SlotsTuple = Tuple[str, ...]
+    MembersDict = Dict[str, Dict[Type, MemberDescriptorType]]
+    StateDict = Dict[str, Dict[Type, Any]]
 
 
 def privatize_name(cls_name, name):
@@ -97,9 +101,8 @@ class SlottedMeta(type):
         """Make slotted class."""
         for base in bases:
             if isinstance(base.__dict__.get("__dict__"), GetSetDescriptorType):
-                raise TypeError(
-                    "base '{}' does not enforce '__slots__'".format(base.__name__)
-                )
+                error = "base '{}' does not enforce '__slots__'".format(base.__name__)
+                raise TypeError(error)
         dct = dict(dct)
         dct["__slots__"] = tuple(dct.get("__slots__", ()))
         return cast(SlottedMeta, super(SlottedMeta, mcs).__new__(mcs, name, bases, dct))

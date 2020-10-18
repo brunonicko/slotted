@@ -23,7 +23,7 @@ def test_all():
         assert name.startswith("Slotted")
         assert hasattr(slotted_abc, name)
 
-        original_name = name[len("Slotted"):]
+        original_name = name[len("Slotted") :]
         assert original_name in collections_all
 
         cls = getattr(slotted_abc, name)
