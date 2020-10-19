@@ -5,7 +5,7 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="slotted",
-    version="1.0.2",
+    version="1.0.3",
     author="Bruno Nicko",
     author_email="brunonicko@gmail.com",
     description="Enforces usage of '__slots__' for python classes",
@@ -13,11 +13,17 @@ setuptools.setup(
     long_description_content_type="text/x-rst",
     url="https://github.com/brunonicko/slotted",
     packages=setuptools.find_packages(),
-    install_requires=["six", "typing"],
+    install_requires=["six", "typing; python_version < '3.5'"],
     classifiers=[
-        "Programming Language :: Python :: 2.7",
+        "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: Implementation :: PyPy",
     ],
     python_requires=">=2.7",
 )
