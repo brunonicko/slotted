@@ -13,6 +13,7 @@ setuptools.setup(
     long_description_content_type="text/x-rst",
     url="https://github.com/brunonicko/slotted",
     packages=setuptools.find_packages(),
+    package_data={"slotted": ["__init__.pyi"]},
     install_requires=["six", "typing; python_version < '3.5'"],
     classifiers=[
         "Intended Audience :: Developers",
