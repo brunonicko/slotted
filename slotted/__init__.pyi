@@ -3,6 +3,7 @@
 
 from abc import ABC, ABCMeta
 from typing import (
+    AbstractSet,
     Any,
     Callable,
     Container,
@@ -18,7 +19,6 @@ from typing import (
     MutableSequence,
     MutableSet,
     Sequence,
-    Set,
     Sized,
     Type,
     ValuesView,
@@ -105,7 +105,7 @@ class SlottedMutableSet(MutableSet, SlottedABC, metaclass=ABCMeta):
 class SlottedSequence(Sequence, SlottedABC, metaclass=ABCMeta):
     pass
 
-class SlottedSet(Set, SlottedABC, metaclass=ABCMeta):
+class SlottedSet(AbstractSet, SlottedABC, metaclass=ABCMeta):
     pass
 
 class SlottedSized(Sized, SlottedABC, metaclass=ABCMeta):
