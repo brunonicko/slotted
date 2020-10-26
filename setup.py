@@ -5,7 +5,7 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="slotted",
-    version="1.1.0",
+    version="1.1.1",
     author="Bruno Nicko",
     author_email="brunonicko@gmail.com",
     description="Enforces usage of '__slots__' for python classes",
