@@ -13,8 +13,8 @@ if TYPE_CHECKING:
     from typing import Any, Dict, List, Set, Tuple, Type, Union
 
 __all__ = [
-    "SlottedABC",
     "SlottedABCMeta",
+    "SlottedABC",
     "SlottedCallable",
     "SlottedContainer",
     "SlottedHashable",
@@ -31,6 +31,26 @@ __all__ = [
     "SlottedSet",
     "SlottedSized",
     "SlottedValuesView",
+]
+
+_ABC_ALL = [
+    "ABCMeta",
+    "Callable",
+    "Container",
+    "Hashable",
+    "ItemsView",
+    "Iterable",
+    "Iterator",
+    "KeysView",
+    "Mapping",
+    "MappingView",
+    "MutableMapping",
+    "MutableSequence",
+    "MutableSet",
+    "Sequence",
+    "Set",
+    "Sized",
+    "ValuesView",
 ]
 
 SlottedCallable = collections_abc.Callable
@@ -58,8 +78,6 @@ class SlottedABCMeta(SlottedMeta, ABCMeta):
 class SlottedABC(with_metaclass(SlottedABCMeta, Slotted)):
     """Slotted 'ABC' base class."""
 
-
-_ABC_ALL = set(getattr(collections_abc, "__all__"))
 
 _CLASSES = set()  # type: Set[Type]
 for cls_name in _ABC_ALL:
@@ -118,8 +136,6 @@ def convert_meta(source):
         type.__setattr__(cast(type, target), name, value)
     _CACHE[source] = target
 
-    if source_name in _ABC_ALL:
-        __all__.append(target_name)
     return target
 
 
@@ -154,8 +170,6 @@ def convert(source):
         raise AssertionError(error)
 
     source.register(target)
-    if source_name in _ABC_ALL and target_name not in __all__:
-        __all__.append(target_name)
     return target
 
 

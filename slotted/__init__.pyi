@@ -1,6 +1,12 @@
+# -*- coding: utf-8 -*-
+"""Package stub file."""
+
+from abc import ABC, ABCMeta
 from typing import (
+    Any,
     Callable,
     Container,
+    Dict,
     Hashable,
     ItemsView,
     Iterable,
@@ -14,10 +20,17 @@ from typing import (
     Sequence,
     Set,
     Sized,
+    Type,
     ValuesView,
 )
 
 __all__ = [
+    "get_state",
+    "set_state",
+    "SlottedMeta",
+    "Slotted",
+    "SlottedABCMeta",
+    "SlottedABC",
     "SlottedCallable",
     "SlottedContainer",
     "SlottedHashable",
@@ -36,66 +49,67 @@ __all__ = [
     "SlottedValuesView",
 ]
 
-
-class SlottedCallable(Callable):
+def get_state(obj):  # type: (Slotted) -> Dict[str, Dict[Type, Any]]
     pass
 
-
-class SlottedContainer(Container):
+def set_state(obj, state):  # type: (Slotted, Dict[str, Dict[Type, Any]]) -> None
     pass
 
-
-class SlottedHashable(Hashable):
+class SlottedMeta(type):
     pass
 
-
-class SlottedItemsView(ItemsView):
+class Slotted(metaclass=SlottedMeta):
     pass
 
-
-class SlottedIterable(Iterable):
+class SlottedABCMeta(SlottedMeta, ABCMeta):
     pass
 
-
-class SlottedIterator(Iterator):
+class SlottedABC(Slotted, ABC, metaclass=SlottedABCMeta):
     pass
 
+SlottedCallable = Callable
 
-class SlottedKeysView(KeysView):
+class SlottedContainer(Container, SlottedABC, metaclass=ABCMeta):
     pass
 
-
-class SlottedMapping(Mapping):
+class SlottedHashable(Hashable, SlottedABC, metaclass=ABCMeta):
     pass
 
-
-class SlottedMappingView(MappingView):
+class SlottedItemsView(ItemsView, SlottedABC, metaclass=ABCMeta):
     pass
 
-
-class SlottedMutableMapping(MutableMapping):
+class SlottedIterable(Iterable, SlottedABC, metaclass=ABCMeta):
     pass
 
-
-class SlottedMutableSequence(MutableSequence):
+class SlottedIterator(Iterator, SlottedABC, metaclass=ABCMeta):
     pass
 
-
-class SlottedMutableSet(MutableSet):
+class SlottedKeysView(KeysView, SlottedABC, metaclass=ABCMeta):
     pass
 
-
-class SlottedSequence(Sequence):
+class SlottedMapping(Mapping, SlottedABC, metaclass=ABCMeta):
     pass
 
-
-class SlottedSet(Set):
+class SlottedMappingView(MappingView, SlottedABC, metaclass=ABCMeta):
     pass
 
-
-class SlottedSized(Sized):
+class SlottedMutableMapping(MutableMapping, SlottedABC, metaclass=ABCMeta):
     pass
 
+class SlottedMutableSequence(MutableSequence, SlottedABC, metaclass=ABCMeta):
+    pass
 
-class SlottedValuesView(ValuesView):
+class SlottedMutableSet(MutableSet, SlottedABC, metaclass=ABCMeta):
+    pass
+
+class SlottedSequence(Sequence, SlottedABC, metaclass=ABCMeta):
+    pass
+
+class SlottedSet(Set, SlottedABC, metaclass=ABCMeta):
+    pass
+
+class SlottedSized(Sized, SlottedABC, metaclass=ABCMeta):
+    pass
+
+class SlottedValuesView(ValuesView, SlottedABC, metaclass=ABCMeta):
     pass
