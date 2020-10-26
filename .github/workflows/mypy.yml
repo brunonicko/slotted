@@ -29,5 +29,4 @@ jobs:
         pip install mypy
     - name: Mypy check
       run: |
-        mypy slotted --py2
-    
+        mypy slotted
