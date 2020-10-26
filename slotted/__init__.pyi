@@ -2,6 +2,7 @@
 """Package stub file."""
 
 from abc import ABC, ABCMeta
+from types import MemberDescriptorType
 from typing import (
     AbstractSet,
     Any,
@@ -56,10 +57,12 @@ def set_state(obj, state):  # type: (Slotted, Dict[str, Dict[Type, Any]]) -> Non
     pass
 
 class SlottedMeta(type):
-    pass
+    @property
+    def __members__(cls) -> Dict[str, Dict[Type, MemberDescriptorType]]: ...
 
 class Slotted(metaclass=SlottedMeta):
-    pass
+    def __getstate__(self) -> Dict[str, Dict[Type, Any]]: ...
+    def __setstate__(self, state: Dict[str, Dict[Type, Any]]) -> None: ...
 
 class SlottedABCMeta(SlottedMeta, ABCMeta):
     pass
