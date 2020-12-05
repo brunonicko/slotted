@@ -144,8 +144,11 @@ def convert_meta(source):
             for k, v in iteritems(target_dct):
                 setattr(ns, k, v)
 
-        target = new_class(
-            target_name, target_bases, {"metaclass": SlottedABCMeta}, exec_body
+        target = cast(
+            "SlottedABCMeta",
+            new_class(
+                target_name, target_bases, {"metaclass": SlottedABCMeta}, exec_body
+            )
         )
 
     for name, value in iteritems(overrides):
