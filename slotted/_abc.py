@@ -131,7 +131,20 @@ def convert_meta(source):
     target_dct, overrides = extract_dict(source)
     target_dct["__module__"] = __name__
 
-    target = SlottedABCMeta(target_name, target_bases, target_dct)
+    try:
+        target = SlottedABCMeta(target_name, target_bases, target_dct)
+    except TypeError:  # workaround for python 3.9
+        from types import new_class
+
+        def exec_body(ns):
+            for k, v in iteritems(target_dct):
+                setattr(ns, k, v)
+
+        target = new_class(
+            target_name, target_bases, {"metaclass": SlottedABCMeta}, exec_body
+        )
+        print(target)
+
     for name, value in iteritems(overrides):
         type.__setattr__(cast(type, target), name, value)
     _CACHE[source] = target
