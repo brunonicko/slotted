@@ -5,6 +5,11 @@ from types import MemberDescriptorType
 from typing import TYPE_CHECKING, cast
 
 try:
+    from types import new_class
+except ImportError:
+    new_class = None  # type: ignore
+
+try:
     import collections.abc as collections_abc
 except ImportError:
     import collections as collections_abc  # type: ignore
@@ -135,14 +140,12 @@ def convert_meta(source):
     target_dct, overrides = extract_dict(source)
     target_dct["__module__"] = __name__
 
-    try:
-        target = SlottedABCMeta(target_name, target_bases, target_dct)
-    except TypeError:  # workaround for python 3.9
-        from types import new_class
+    if new_class is not None:
 
         def exec_body(ns):
             for k, v in iteritems(target_dct):
-                setattr(ns, k, v)
+                ns[k] = v
+            return ns
 
         target = cast(
             "SlottedABCMeta",
@@ -150,6 +153,8 @@ def convert_meta(source):
                 target_name, target_bases, {"metaclass": SlottedABCMeta}, exec_body
             )
         )
+    else:
+        target = SlottedABCMeta(target_name, target_bases, target_dct)
 
     for name, value in iteritems(overrides):
         type.__setattr__(cast(type, target), name, value)
@@ -179,7 +184,17 @@ def convert(source):
     target_dct.pop("__dict__", None)
     target_dct["__module__"] = __name__
 
-    target = meta(target_name, target_bases, target_dct)
+    if new_class is not None:
+
+        def exec_body(ns):
+            for k, v in iteritems(target_dct):
+                ns[k] = v
+            return ns
+
+        target = new_class(target_name, target_bases, {"metaclass": meta}, exec_body)
+    else:
+        target = meta(target_name, target_bases, target_dct)
+
     for name, value in iteritems(overrides):
         type.__setattr__(target, name, value)
     _CACHE[source] = target
