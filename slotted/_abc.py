@@ -147,7 +147,6 @@ def convert_meta(source):
         target = new_class(
             target_name, target_bases, {"metaclass": SlottedABCMeta}, exec_body
         )
-        print(target)
 
     for name, value in iteritems(overrides):
         type.__setattr__(cast(type, target), name, value)
