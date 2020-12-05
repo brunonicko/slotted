@@ -3,8 +3,12 @@
 
 from abc import ABCMeta
 
+try:
+    import collections.abc as collections_abc
+except ImportError:
+    import collections as collections_abc  # type: ignore
+
 import pytest
-from six.moves import collections_abc
 
 from slotted import _abc as slotted_abc
 from slotted._abc import __all__ as slotted_abc_all

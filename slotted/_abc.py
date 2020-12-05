@@ -4,8 +4,12 @@ from abc import ABCMeta
 from types import MemberDescriptorType
 from typing import TYPE_CHECKING, cast
 
+try:
+    import collections.abc as collections_abc
+except ImportError:
+    import collections as collections_abc  # type: ignore
+
 from six import iteritems, with_metaclass
-from six.moves import collections_abc
 
 from ._bases import Slotted, SlottedMeta, privatize_name
 
