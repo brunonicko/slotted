@@ -10,7 +10,7 @@ Slotted
    :target: https://github.com/brunonicko/slotted/actions?query=workflow%3ATests
 
 .. image:: https://readthedocs.org/projects/slotted/badge/?version=stable
-   :target: https://slotted.readthedocs.io/en/latest/
+   :target: https://slotted.readthedocs.io/en/stable/
 
 .. image:: https://img.shields.io/github/license/brunonicko/slotted?color=light-green
    :target: https://github.com/brunonicko/slotted/blob/master/LICENSE
