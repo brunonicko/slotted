@@ -1,19 +1,29 @@
 Slotted
 =======
 .. image:: https://github.com/brunonicko/slotted/workflows/MyPy/badge.svg
-    :target: https://github.com/brunonicko/slotted/actions?query=workflow%3AMyPy
+   :target: https://github.com/brunonicko/slotted/actions?query=workflow%3AMyPy
 
 .. image:: https://github.com/brunonicko/slotted/workflows/Lint/badge.svg
-    :target: https://github.com/brunonicko/slotted/actions?query=workflow%3ALint
+   :target: https://github.com/brunonicko/slotted/actions?query=workflow%3ALint
 
 .. image:: https://github.com/brunonicko/slotted/workflows/Tests/badge.svg
-    :target: https://github.com/brunonicko/slotted/actions?query=workflow%3ATests
+   :target: https://github.com/brunonicko/slotted/actions?query=workflow%3ATests
 
-.. image:: https://readthedocs.org/projects/slotted/badge/?version=latest
-    :target: https://slotted.readthedocs.io/en/latest/
+.. image:: https://readthedocs.org/projects/slotted/badge/?version=stable
+   :target: https://slotted.readthedocs.io/en/latest/
+
+.. image:: https://img.shields.io/github/license/brunonicko/slotted?color=light-green
+   :target: https://github.com/brunonicko/slotted/blob/master/LICENSE
+
+.. image:: https://static.pepy.tech/personalized-badge/slotted?period=total&units=inter\
+national_system&left_color=grey&right_color=brightgreen&left_text=Downloads
+   :target: https://pepy.tech/project/slotted
+
+.. image:: https://img.shields.io/pypi/pyversions/slotted?color=light-green&style=flat
+   :target: https://pypi.org/project/slotted/
 
 .. image:: https://badge.fury.io/py/slotted.svg
-    :target: https://pypi.org/project/slotted/
+   :target: https://pypi.org/project/slotted/
 
 Enforces usage of ``__slots__`` for python classes and provides pickling capabilities.
 

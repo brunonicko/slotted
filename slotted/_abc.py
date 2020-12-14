@@ -240,6 +240,14 @@ def convert(source):
                 source.__module__, source.__name__
             ),
             "\n\n",
+            (
+                ".. note::\n"
+                "   This class is not available in older versions of Python and "
+                "   `SlottedCollection` will be set to `None`."
+                "\n\n"
+            )
+            if source_name == "Collection"
+            else "",
             "Metaclass: :class:`slotted.SlottedABCMeta`",
             "\n\n",
             "Inherits from:\n",
