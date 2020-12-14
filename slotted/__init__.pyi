@@ -7,6 +7,7 @@ from typing import (
     AbstractSet,
     Any,
     Callable,
+    Collection,
     Container,
     Dict,
     Hashable,
@@ -48,6 +49,7 @@ __all__ = [
     "SlottedSet",
     "SlottedSized",
     "SlottedValuesView",
+    "SlottedCollection",
 ]
 
 def get_state(obj):  # type: (Slotted) -> Dict[str, Dict[Type, Any]]
@@ -115,4 +117,7 @@ class SlottedSized(Sized, SlottedABC, metaclass=ABCMeta):
     pass
 
 class SlottedValuesView(ValuesView, SlottedABC, metaclass=ABCMeta):
+    pass
+
+class SlottedCollection(Collection, SlottedABC, metaclass=ABCMeta):
     pass

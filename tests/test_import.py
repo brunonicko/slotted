@@ -18,7 +18,17 @@ def test_import_abc():
 
     assert _collections_all
     for name in _collections_all:
-        assert getattr(slotted, name)
+        member = getattr(slotted, name)
+        if member is None:
+            assert name == "SlottedCollection"
+            with pytest.raises(ImportError):
+                try:
+                    # noinspection PyCompatibility
+                    from collections.abc import Collection  # noqa
+                except ImportError:
+                    from collections import Collection  # noqa
+        else:
+            assert getattr(slotted, name)
 
 
 if __name__ == "__main__":

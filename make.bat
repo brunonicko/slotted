@@ -17,15 +17,21 @@ IF "%1" == "" (
     goto format
 ) ELSE IF "%1" == "lint" (
     goto lint
+) ELSE IF "%1" == "docs" (
+    goto docs
 ) ELSE (
     echo Invalid Command
     goto end
 )
 
 :clean
+rmdir /s /q .\docs\build 2>nul
 rmdir /s /q .\.mypy_cache 2>nul
 rmdir /s /q .\.pytest_cache 2>nul
+rmdir /s /q .\.tox 2>nul
+rmdir /s /q .\build 2>nul
 rmdir /s /q .\dist 2>nul
+rmdir /s /q .\slotted.egg-info 2>nul
 del /S *.pyc >nul 2>&1
 goto end
 
@@ -38,6 +44,7 @@ goto end
 
 :tests
 python -m pytest tests
+python -m pytest -vv -rs slotted --doctest-modules
 goto end
 
 :mypy
@@ -52,6 +59,7 @@ rem # black .\slotted .\tests setup.py
 forfiles /p .\slotted /s /m *.py /c "cmd /c start /b black @path"
 forfiles /p .\tests /s /m *.py /c "cmd /c start /b black @path"
 black setup.py
+black .\docs\source\conf.py
 goto end
 
 :lint
@@ -61,6 +69,10 @@ flake8 .\tests --count --select=E9,F63,F7,F82 --show-source --statistics
 rem # Exit-zero treats all errors as warnings.
 flake8 .\slotted --count --exit-zero --ignore=F403,F401,E203 --max-complexity=10 --max-line-length=88 --statistics
 flake8 .\tests --count --exit-zero --ignore=F403,F401,E203 --max-complexity=10 --max-line-length=88 --statistics
+goto end
+
+:docs
+%~dp0docs\make html
 goto end
 
 :end

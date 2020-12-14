@@ -5,6 +5,7 @@ from ._abc import (
     SlottedABC,
     SlottedABCMeta,
     SlottedCallable,
+    SlottedCollection,
     SlottedContainer,
     SlottedHashable,
     SlottedItemsView,
@@ -46,4 +47,5 @@ __all__ = [
     "SlottedSet",
     "SlottedSized",
     "SlottedValuesView",
+    "SlottedCollection",
 ]
