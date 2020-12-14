@@ -63,7 +63,30 @@ def scrape_all_members(base):
 
 def get_state(obj):
     # type: (Slotted) -> StateDict
-    """Get state of a slotted object for pickling purposes."""
+    """
+    Get state of a slotted object.
+
+    .. code:: python
+
+        >>> from six import with_metaclass
+        >>> from slotted import SlottedMeta, get_state
+
+        >>> class A(with_metaclass(SlottedMeta, object)):
+        ...     __slots__ = ("a", "b")
+        ...
+        >>> a = A()
+        >>> a.a = 1
+        >>> a.b = 2
+        >>> get_state(a) == {
+        ...     "a": {A: 1}, "b": {A: 2}
+        ... }
+        True
+
+    :param obj: Slotted object (metaclass inherits from :class:`slotted.SlottedMeta`).
+
+    :return: State.
+    :rtype: dict
+    """
     state = {}  # type: StateDict
     for name, members in iteritems(type(obj).__members__):
         for base, member in iteritems(members):
@@ -78,7 +101,31 @@ def get_state(obj):
 
 def set_state(obj, state):
     # type: (Slotted, StateDict) -> None
-    """Set state of a slotted object for unpickling purposes."""
+    """
+    Set state of a slotted object.
+
+    .. code:: python
+
+        >>> from six import with_metaclass
+        >>> from slotted import SlottedMeta, set_state
+
+        >>> class A(with_metaclass(SlottedMeta, object)):
+        ...     __slots__ = ("a", "b")
+        ...
+        >>> a = A()
+        >>> set_state(a, {
+        ...     "a": {A: 1}, "b": {A: 2}
+        ... })
+        >>> a.a
+        1
+        >>> a.b
+        2
+
+    :param obj: Slotted object (metaclass inherits from :class:`slotted.SlottedMeta`).
+
+    :param state: State.
+    :type state: dict
+    """
     for name, bases in iteritems(state):
         for base, value in iteritems(bases):
             member = base.__dict__[name]
@@ -88,7 +135,12 @@ def set_state(obj, state):
 
 
 class SlottedMeta(type):
-    """Enforces usage of '__slots__'."""
+    """
+    Enforces usage of '__slots__'.
+
+    Inherits from:
+      - :class:`type`
+    """
 
     @staticmethod
     def __new__(
@@ -110,6 +162,29 @@ class SlottedMeta(type):
     @property
     def __members__(cls):
         # type: () -> MembersDict
+        """
+        Get slot members by name and base. Can be used for pickling purposes.
+
+        .. code:: python
+
+            >>> from six import with_metaclass
+            >>> from slotted import SlottedMeta
+
+            >>> class A(with_metaclass(SlottedMeta, object)):
+            ...     __slots__ = ("a", "b")
+            ...
+            >>> class B(A):
+            ...     __slots__ = ("b", "c")
+            ...
+            >>> B.__members__ == {
+            ...     "a": {A: A.a},
+            ...     "b": {A: A.b, B: B.b},
+            ...     "c": {B: B.c},
+            ... }
+            True
+
+        :rtype: dict
+        """
         members = {}  # type: MembersDict
         for base in reversed(cls.__mro__):
             if base is cls:
@@ -123,16 +198,64 @@ class SlottedMeta(type):
 
 
 class Slotted(with_metaclass(SlottedMeta, object)):
-    """Enforces usage of '__slots__' and implements pickling methods based on state."""
+    """
+    Enforces usage of '__slots__' and implements pickling methods based on state.
+
+    Metaclass: :class:`slotted.SlottedABCMeta`
+
+    Inherits from:
+      - :class:`object`
+    """
 
     __slots__ = ()  # type: SlotsTuple
 
     def __getstate__(self):
         # type: () -> StateDict
-        """Get state for pickling."""
+        """
+        Get state for pickling.
+
+        .. code:: python
+
+            >>> from slotted import Slotted
+
+            >>> class A(Slotted):
+            ...     __slots__ = ("a", "b")
+            ...
+            >>> a = A()
+            >>> a.a = 1
+            >>> a.b = 2
+            >>> a.__getstate__() == {
+            ...     "a": {A: 1}, "b": {A: 2}
+            ... }
+            True
+
+        :return: Pickled state.
+        :rtype: dict
+        """
         return get_state(self)
 
     def __setstate__(self, state):
         # type: (StateDict) -> None
-        """Set state for unpickling."""
+        """
+        Set state for unpickling.
+
+        .. code:: python
+
+            >>> from slotted import Slotted
+
+            >>> class A(Slotted):
+            ...     __slots__ = ("a", "b")
+            ...
+            >>> a = A()
+            >>> a.__setstate__({
+            ...     "a": {A: 1}, "b": {A: 2}
+            ... })
+            >>> a.a
+            1
+            >>> a.b
+            2
+
+        :param state: Pickled state.
+        :type state: dict
+        """
         set_state(self, state)

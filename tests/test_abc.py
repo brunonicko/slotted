@@ -28,6 +28,17 @@ def test_all():
         assert hasattr(slotted_abc, name)
 
         original_name = name[len("Slotted") :]
+        if original_name not in collections_all:
+            assert original_name == "Collection"
+            with pytest.raises(ImportError):
+                try:
+                    # noinspection PyCompatibility
+                    from collections.abc import Collection  # noqa
+                except ImportError:
+                    from collections import Collection  # noqa
+            assert getattr(slotted_abc, name) is None
+            continue
+
         assert original_name in collections_all
 
         cls = getattr(slotted_abc, name)

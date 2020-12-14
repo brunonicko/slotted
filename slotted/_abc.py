@@ -40,6 +40,7 @@ __all__ = [
     "SlottedSet",
     "SlottedSized",
     "SlottedValuesView",
+    "SlottedCollection",
 ]
 
 _ABC_ALL = [
@@ -62,6 +63,7 @@ _ABC_ALL = [
     "ValuesView",
 ]
 
+
 SlottedCallable = collections_abc.Callable
 SlottedContainer = collections_abc.Container
 SlottedHashable = collections_abc.Hashable
@@ -80,12 +82,43 @@ SlottedSized = collections_abc.Sized
 SlottedValuesView = collections_abc.ValuesView
 
 
+# Try to get 'Collection' if it's available.
+try:
+    SlottedCollection = collections_abc.Collection  # type: ignore
+except AttributeError:
+    SlottedCollection = None  # type: ignore
+else:
+    _ABC_ALL.append("Collection")
+
+
 class SlottedABCMeta(SlottedMeta, ABCMeta):
-    """Metaclass for 'SlottedABC'. Combines 'SlottedMeta' and 'ABCMeta'."""
+    """
+    Slotted version of :class:`abc.ABCMeta`.
+
+    Inherits from:
+      - :class:`slotted.SlottedMeta`
+      - :class:`abc.ABCMeta`.
+    """
 
 
 class SlottedABC(with_metaclass(SlottedABCMeta, Slotted)):
-    """Slotted 'ABC' base class."""
+    """
+    Slotted version of :class:`abc.ABC`.
+
+    Metaclass: :class:`slotted.SlottedABCMeta`
+
+    Inherits from:
+      - :class:`slotted.Slotted`
+    """
+
+
+# Register 'SlottedABC' as a subclass of 'ABC' if possible.
+try:
+    from abc import ABC
+except ImportError:
+    ABC = None  # type: ignore
+else:
+    ABC.register(SlottedABC)
 
 
 _CLASSES = set()  # type: Set[Type]
@@ -139,6 +172,24 @@ def convert_meta(source):
     target_bases = tuple(target_bases_list)
     target_dct, overrides = extract_dict(source)
     target_dct["__module__"] = __name__
+    target_dct["__doc__"] = "".join(
+        (
+            "Slotted version of :class:`{}.{}`.".format(
+                source.__module__, source.__name__
+            ),
+            "\n\n",
+            "Inherits from:\n",
+            "\n".join(
+                "  - :class:`{}.{}`".format(
+                    b.__module__.replace("slotted._abc", "slotted").replace(
+                        "slotted._bases", "slotted"
+                    ),
+                    b.__name__,
+                )
+                for b in target_bases
+            ),
+        )
+    )
 
     if new_class is not None:
 
@@ -151,7 +202,7 @@ def convert_meta(source):
             "SlottedABCMeta",
             new_class(
                 target_name, target_bases, {"metaclass": SlottedABCMeta}, exec_body
-            )
+            ),
         )
     else:
         target = SlottedABCMeta(target_name, target_bases, target_dct)
@@ -183,6 +234,26 @@ def convert(source):
     target_dct, overrides = extract_dict(source)
     target_dct.pop("__dict__", None)
     target_dct["__module__"] = __name__
+    target_dct["__doc__"] = "".join(
+        (
+            "Slotted version of :class:`{}.{}`.".format(
+                source.__module__, source.__name__
+            ),
+            "\n\n",
+            "Metaclass: :class:`slotted.SlottedABCMeta`",
+            "\n\n",
+            "Inherits from:\n",
+            "\n".join(
+                "  - :class:`{}.{}`".format(
+                    b.__module__.replace("slotted._abc", "slotted").replace(
+                        "slotted._bases", "slotted"
+                    ),
+                    b.__name__,
+                )
+                for b in target_bases
+            ),
+        )
+    )
 
     if new_class is not None:
 
