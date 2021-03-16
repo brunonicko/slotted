@@ -21,9 +21,6 @@ Slotted
 .. image:: https://img.shields.io/pypi/pyversions/slotted?color=light-green&style=flat
    :target: https://pypi.org/project/slotted/
 
-.. image:: https://badge.fury.io/py/slotted.svg
-   :target: https://pypi.org/project/slotted/
-
 Enforces usage of ``__slots__`` for python classes and provides pickling capabilities.
 
 Examples
