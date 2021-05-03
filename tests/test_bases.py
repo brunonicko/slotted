@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Tests for `slotted._abc`."""
 
+import sys
+
 import pytest
 import six
 
@@ -149,6 +151,23 @@ def test_slotted():
     assert Foo.foo.__get__(bar) == Foo.foo.__get__(new_bar)
     assert bar.bar == new_bar.bar
     assert bar.foobar == new_bar.foobar
+
+
+def test_init_subclass():
+    """Test `__init_subclass__` behavior (python >= 3.6 only)."""
+    if sys.version_info[0:2] < (3, 6):
+        return
+
+    class Class(Slotted):
+        def __init_subclass__(cls, **kwargs):
+            parameter = kwargs["parameter"]
+            assert parameter == 1
+            cls.parameter = kwargs["parameter"]
+
+    from types import new_class
+
+    sub = new_class("Subclass", bases=(Class,), kwds={"parameter": 1})
+    assert sub.parameter == 1
 
 
 if __name__ == "__main__":

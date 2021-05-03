@@ -242,10 +242,10 @@ def convert(source):
             "\n\n",
             (
                 ".. note::\n"
-                "   This class is not available in older versions of Python and "
-                "   `SlottedCollection` will be set to `None`."
+                "   This class is not available in some older versions of Python. "
+                "   When that's the case, `{}` will be set to `None`."
                 "\n\n"
-            )
+            ).format(target_name)
             if source_name == "Collection"
             else "",
             "Metaclass: :class:`slotted.SlottedABCMeta`",

@@ -148,6 +148,7 @@ class SlottedMeta(type):
         name,  # type: str
         bases,  # type: Tuple[Type, ...]
         dct,  # type: Dict[str, Any]
+        **k  # type: Any
     ):
         # type: (...) -> SlottedMeta
         """Make slotted class."""
@@ -157,7 +158,10 @@ class SlottedMeta(type):
                 raise TypeError(error)
         dct = dict(dct)
         dct["__slots__"] = tuple(dct.get("__slots__", ()))
-        return cast(SlottedMeta, super(SlottedMeta, mcs).__new__(mcs, name, bases, dct))
+        return cast(
+            SlottedMeta,
+            super(SlottedMeta, mcs).__new__(mcs, name, bases, dct, **k),  # type: ignore
+        )
 
     @property
     def __members__(cls):
