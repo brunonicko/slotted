@@ -1,5 +1,5 @@
-Welcome to Slotted's documentation!
-===================================
+Welcome to Slotted documentation!
+=================================
 
 .. toctree::
    :maxdepth: 2
