@@ -1,28 +1,23 @@
-.PHONY: clean environment tests mypy format lint
+.PHONY: clean environment tests mypy format lint docs
 
 clean:
-	rm -rf ./docs/build .mypy_cache .pytest_cache .tox build dist slotted.egg-info
+	rm -rf ./docs/build .tox .mypy_cache .pytest_cache build dist slotted.egg-info
 	find . -name '*.pyc' -delete
 environment:
 	python -m pip install --upgrade pip
 	pip install -r requirements.txt --upgrade
 	pip install -r dev_requirements.txt --upgrade
 tests:
-	python -m pytest tests
-	python -m pytest -vv -rs slotted --doctest-modules
+	python -m pytest tests_slotted.py
+	python -m pytest README.rst --doctest-glob="*.rst"
 mypy:
-	mypy slotted
+	mypy slotted.py
 format:
-	autoflake --remove-all-unused-imports --in-place --recursive .\slotted
-	autoflake --remove-all-unused-imports --in-place --recursive .\tests
-	isort slotted tests ./docs/source/conf.py setup.py -m 3 -l 88 --up --tc --lbt 0 --color
-	black slotted tests ./docs/source/conf.py setup.py
+	autoflake --remove-all-unused-imports --in-place slotted.py tests_slotted.py
+	isort slotted.py tests_slotted.py ./docs/source/conf.py setup.py -m 3 -l 88 --up --tc --lbt 0 --color
+	black slotted.py tests_slotted.py ./docs/source/conf.py setup.py
 lint:
-	# Stop if there are Python syntax errors or undefined names.
-	flake8 slotted --count --select=E9,F63,F7,F82 --show-source --statistics
-	flake8 tests --count --select=E9,F63,F7,F82 --show-source --statistics
-	# Exit-zero treats all errors as warnings.
-	flake8 slotted --count --exit-zero --ignore=F403,F401,W503,C901,E203 --max-complexity=10 --max-line-length=88 --statistics
-	flake8 tests --count --exit-zero --ignore=F403,F401,W503,C901,E203 --max-complexity=10 --max-line-length=88 --statistics
+	flake8 slotted.py --count --ignore=F403,F401,W503,C901,E203 --max-complexity=10 --max-line-length=120 --statistics
+	flake8 tests_slotted.py --count --ignore=F403,F401,W503,C901,E203 --max-complexity=10 --max-line-length=120 --statistics
 docs:
-	cd docs; make html
+	sphinx-build -M html ./docs/source ./docs/build
