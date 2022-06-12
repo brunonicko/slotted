@@ -1,6 +1,7 @@
 import abc
 import inspect
-from typing import Set, Type
+
+from tippo import Set, Type
 
 __all__ = ["SlottedMeta", "Slotted", "SlottedABCMeta", "SlottedABC", "slots"]
 

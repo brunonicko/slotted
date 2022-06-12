@@ -1,6 +1,7 @@
 autoflake
 black
 flake8
+invoke
 isort
 mypy
 pytest
