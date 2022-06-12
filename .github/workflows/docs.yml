@@ -2,9 +2,9 @@ name: Docs
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install sphinx sphinx_rtd_theme
+        pip install invoke sphinx sphinx_rtd_theme
     - name: Docs
       run: |
-        make docs
+        inv docs
