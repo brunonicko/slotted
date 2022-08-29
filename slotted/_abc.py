@@ -9,6 +9,8 @@ except ImportError:
     import collections as collections_abc  # type: ignore
 
 from tippo import Any, Dict, List, Set, Tuple, Type, Union
+from basicco.generic_meta import GenericMeta
+from basicco.mangling import mangle
 
 from ._slotted import Slotted, SlottedMeta
 
@@ -143,13 +145,6 @@ _CACHE = {
     object: SlottedABC,
     abc.ABCMeta: SlottedABCMeta,
 }  # type: Dict[Type[Any], Union[SlottedABCMeta, Type[SlottedABCMeta]]]
-
-
-def mangle(name, owner_name):
-    # type: (str, str) -> str
-    if name.startswith("__") and not name.endswith("__"):
-        return "_{}{}".format(owner_name.lstrip("_"), name)
-    return name
 
 
 def extract_dict(base):
@@ -290,19 +285,18 @@ def convert(source):
 
 
 # Convert all classes.
-_CONVERTED_METACLASSES = {}  # type: Dict[Type, Type]
-_CONVERTED_CLASSES = {}  # type: Dict[Type, Type]
 for original in _CLASSES:
     converted = convert(tippo.cast(abc.ABCMeta, original))
     globals()[converted.__name__] = converted
-    if issubclass(original, type):
-        assert issubclass(converted, type)
-        _CONVERTED_METACLASSES[original] = converted
-    else:
-        _CONVERTED_CLASSES[original] = converted
+
+
+# Get converted classes from cache.
+_CONVERTED_METACLASSES = {o: c for o, c in six.iteritems(_CACHE) if issubclass(o, type)}  # type: Dict[Type, Type]
+_CONVERTED_CLASSES = {o: c for o, c in six.iteritems(_CACHE) if not issubclass(o, type)}  # type: Dict[Type, Type]
 
 
 # Make them generic.
+visited_original_meta = set()
 for original, converted in _CONVERTED_CLASSES.items():
     assert not issubclass(converted, type)
 
@@ -329,11 +323,14 @@ for original, converted in _CONVERTED_CLASSES.items():
         parameters = generic_original.__parameters__
 
         # Replace class.
-        generic_converted = tippo.make_generic(converted, parameters)  # type: ignore
+        _meta = GenericMeta if hasattr(tippo, "GenericMeta") else None
+        generic_converted = tippo.make_generic(converted, parameters, _meta)  # type: ignore
         converted.register(generic_converted)  # type: ignore
         globals()[converted.__name__] = generic_converted
 
         # Replace metaclass.
-        if original_meta in _CONVERTED_METACLASSES:
+        if original_meta in _CONVERTED_METACLASSES and original_meta not in visited_original_meta:
+            visited_original_meta.add(original_meta)
             generic_converted_meta = type(generic_converted)
-            globals()[converted_meta.__name__] = generic_converted_meta
+            if generic_converted_meta is not original_meta:
+                globals()[converted_meta.__name__] = generic_converted_meta

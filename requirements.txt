@@ -1,2 +1,3 @@
-tippo>=2.6,<3
-six
+tippo>=2.7,<3
+basicco>=5.1,<6
+six>=1,<2

@@ -1,4 +1,5 @@
 import pytest
+import pickle
 import six
 
 import slotted
@@ -12,11 +13,19 @@ class Bar(Foo):
     __slots__ = ("bar",)
 
 
+class FooBar(Foo):
+    __slots__ = ("__foobar",)
+
+
 class ForcedBarM(six.with_metaclass(slotted.SlottedMeta, Bar)):
     pass
 
 
 class ForcedBar(Bar, slotted.Slotted):
+    pass
+
+
+class ForcedFooBar(FooBar, slotted.Slotted):
     pass
 
 
@@ -32,6 +41,8 @@ def test_slots():
     for forced_cls in (ForcedBarM, ForcedBar):
         assert hasattr(forced_cls, "__slots__")
         assert slotted.slots(forced_cls) == {"foo", "bar"}
+
+    assert slotted.slots(ForcedFooBar, mangled=True) == {"foo", "_FooBar__foobar"}
 
 
 def test_non_slotted():
@@ -49,6 +60,16 @@ def test_non_slotted():
 
     with pytest.raises(TypeError):
         type("NonSlotted", (NonSlotted, slotted.SlottedABC), {})
+
+
+def test_pickle():
+    bar = ForcedBar()
+    bar.foo = 1
+    bar.bar = 2
+
+    pickled_bar = pickle.loads(pickle.dumps(bar))
+    assert pickled_bar.foo == 1
+    assert pickled_bar.bar == 2
 
 
 if __name__ == "__main__":
