@@ -1,9 +1,10 @@
 import pytest
+import six
 
 import slotted
 
 
-class Foo:
+class Foo(object):
     __slots__ = ("foo",)
 
 
@@ -11,7 +12,7 @@ class Bar(Foo):
     __slots__ = ("bar",)
 
 
-class ForcedBarM(Bar, metaclass=slotted.SlottedMeta):
+class ForcedBarM(six.with_metaclass(slotted.SlottedMeta, Bar)):
     pass
 
 
@@ -19,18 +20,16 @@ class ForcedBar(Bar, slotted.Slotted):
     pass
 
 
-class ForcedBarABCM(ForcedBarM, metaclass=slotted.SlottedABCMeta):
-    pass
+def test_import():
+    from slotted import Slotted, SlottedMeta, slots
 
-
-class ForcedBarABC(ForcedBar, slotted.SlottedABC):
-    pass
+    assert all((Slotted, SlottedMeta, slots))
 
 
 def test_slots():
     assert slotted.slots(Foo) == {"foo"}
     assert slotted.slots(Bar) == {"foo", "bar"}
-    for forced_cls in (ForcedBarM, ForcedBar, ForcedBarABCM, ForcedBarABC):
+    for forced_cls in (ForcedBarM, ForcedBar):
         assert hasattr(forced_cls, "__slots__")
         assert slotted.slots(forced_cls) == {"foo", "bar"}
 

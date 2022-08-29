@@ -66,15 +66,16 @@ raised.
     ...     __slots__ = ("foo",)
     ...
     Traceback (most recent call last):
-    TypeError: <class '__main__.Bar'> does not define __slots__
+    TypeError: base 'Bar' does not define __slots__
 
 ``Slotted`` behavior can also be achieved by using the ``SlottedMeta`` metaclass.
 
 .. code:: python
 
+    >>> from six import with_metaclass
     >>> from slotted import SlottedMeta
 
-    >>> class Foo(metaclass=SlottedMeta):
+    >>> class Foo(with_metaclass(SlottedMeta, object)):
     ...     pass  # implicit declaration of __slots__ = ()
     ...
     >>> foo = Foo()
