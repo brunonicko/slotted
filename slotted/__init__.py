@@ -1,6 +1,7 @@
 from ._slotted import SlottedMeta, Slotted, slots
 from ._abc import (
     SlottedABCMeta,
+    SlottedABCGenericMeta,
     SlottedABC,
     SlottedCallable,
     SlottedContainer,
@@ -26,6 +27,7 @@ __all__ = [
     "Slotted",
     "slots",
     "SlottedABCMeta",
+    "SlottedABCGenericMeta",
     "SlottedABC",
     "SlottedCallable",
     "SlottedContainer",

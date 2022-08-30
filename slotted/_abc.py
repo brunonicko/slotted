@@ -1,14 +1,14 @@
 import abc
-import types
 import tippo
 import six
+import types
 
 try:
     import collections.abc as collections_abc
 except ImportError:
     import collections as collections_abc  # type: ignore
 
-from tippo import Any, Dict, List, Set, Tuple, Type, Union
+from tippo import Any, Generic, Dict, List, Set, Tuple, Type, Union
 from basicco.generic_meta import GenericMeta
 from basicco.mangling import mangle
 
@@ -16,6 +16,7 @@ from ._slotted import Slotted, SlottedMeta
 
 __all__ = [
     "SlottedABCMeta",
+    "SlottedABCGenericMeta",
     "SlottedABC",
     "SlottedCallable",
     "SlottedContainer",
@@ -102,24 +103,20 @@ else:
 
 
 class SlottedABCMeta(SlottedMeta, abc.ABCMeta):
-    """
-    Slotted version of :class:`abc.ABCMeta`.
+    """Slotted version of :class:`abc.ABCMeta`."""
 
-    Inherits from:
-      - :class:`slotted.SlottedMeta`
-      - :class:`abc.ABCMeta`.
-    """
+
+if GenericMeta is type:
+    SlottedABCGenericMeta = SlottedABCMeta
+
+else:
+
+    class SlottedABCGenericMeta(GenericMeta, SlottedABCMeta):  # type: ignore
+        """Slotted version of :class:`typing.GenericMeta`."""
 
 
 class SlottedABC(six.with_metaclass(SlottedABCMeta, Slotted)):
-    """
-    Slotted version of :class:`abc.ABC`.
-
-    Metaclass: :class:`slotted.SlottedABCMeta`
-
-    Inherits from:
-      - :class:`slotted.Slotted`
-    """
+    """Slotted version of :class:`abc.ABC`."""
 
 
 # Register 'SlottedABC' as a subclass of 'ABC' if possible.
@@ -290,13 +287,7 @@ for original in _CLASSES:
     globals()[converted.__name__] = converted
 
 
-# Get converted classes from cache.
-_CONVERTED_METACLASSES = {o: c for o, c in six.iteritems(_CACHE) if issubclass(o, type)}  # type: Dict[Type, Type]
 _CONVERTED_CLASSES = {o: c for o, c in six.iteritems(_CACHE) if not issubclass(o, type)}  # type: Dict[Type, Type]
-
-
-# Make them generic.
-visited_original_meta = set()
 for original, converted in _CONVERTED_CLASSES.items():
     assert not issubclass(converted, type)
 
@@ -313,24 +304,26 @@ for original, converted in _CONVERTED_CLASSES.items():
     ):
         continue
 
-    # Get metaclasses.
-    original_meta = type(original)
-    converted_meta = type(converted)
-
     # Convert to generic.
     generic_original = getattr(tippo, original.__name__)
     if hasattr(generic_original, "__parameters__"):
         parameters = generic_original.__parameters__
+        new_class_args = (
+            converted.__name__,
+            (
+                six.with_metaclass(
+                    SlottedABCGenericMeta,
+                    converted,
+                    Generic[parameters],  # type: ignore
+                ),
+            ),
+        )  # type: ignore
+
+        if hasattr(types, "new_class"):
+            generic_converted = types.new_class(*new_class_args)  # type: ignore
+        else:
+            new_class_args += ({},)  # type: ignore
+            generic_converted = type(*new_class_args)  # type: ignore
 
         # Replace class.
-        _meta = GenericMeta if hasattr(tippo, "GenericMeta") else None
-        generic_converted = tippo.make_generic(converted, parameters, _meta)  # type: ignore
-        converted.register(generic_converted)  # type: ignore
         globals()[converted.__name__] = generic_converted
-
-        # Replace metaclass.
-        if original_meta in _CONVERTED_METACLASSES and original_meta not in visited_original_meta:
-            visited_original_meta.add(original_meta)
-            generic_converted_meta = type(generic_converted)
-            if generic_converted_meta is not original_meta:
-                globals()[converted_meta.__name__] = generic_converted_meta
