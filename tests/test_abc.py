@@ -48,6 +48,8 @@ def test_converted():
 
         original_name = name[len("Slotted") :]
         if original_name not in collections_all:
+            if original_name == "ABCGenericMeta":
+                continue
             assert original_name == "Collection"
             with pytest.raises(ImportError):
                 try:
@@ -89,6 +91,10 @@ def test_generics():
     }
     for generic_cls, type_vars in generics.items():
         assert generic_cls[type_vars]
+
+    metaclasses = set(type(g) for g in generics)
+    assert len(metaclasses) == 1
+    assert next(iter(metaclasses)) is slotted_abc.SlottedABCGenericMeta
 
 
 if __name__ == "__main__":
