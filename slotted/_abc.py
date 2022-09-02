@@ -88,7 +88,7 @@ SlottedMutableMapping = tippo.MutableMapping
 SlottedMutableSequence = tippo.MutableSequence
 SlottedMutableSet = tippo.MutableSet
 SlottedSequence = tippo.Sequence
-SlottedSet = tippo.Set
+SlottedSet = tippo.AbstractSet
 SlottedSized = tippo.Sized
 SlottedValuesView = tippo.ValuesView
 

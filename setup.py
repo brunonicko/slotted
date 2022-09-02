@@ -11,7 +11,7 @@ with open("requirements.txt", "r") as fh:
 
 setuptools.setup(
     name="slotted",
-    version="3.1.0",
+    version="3.1.1",
     author="Bruno Nicko",
     author_email="brunonicko@gmail.com",
     description="Collection of lower-level utilities that enhance code compatibility and validation.",
