@@ -8,8 +8,7 @@ try:
 except ImportError:
     import collections as collections_abc  # type: ignore
 
-from tippo import Any, Generic, Dict, List, Set, Tuple, Type, Union
-from basicco.generic_meta import GenericMeta
+from tippo import Any, GenericMeta, Generic, Dict, List, Set, Tuple, Type, Union
 from basicco.mangling import mangle
 
 from ._slotted import Slotted, SlottedMeta
@@ -297,8 +296,8 @@ for original, converted in _CONVERTED_CLASSES.items():
 
     # Skip if already generic.
     if (
-        hasattr(tippo, "GenericMeta")
-        and isinstance(converted, getattr(tippo, "GenericMeta"))
+        GenericMeta is not type
+        and isinstance(converted, GenericMeta)
         or hasattr(converted, "__class_getitem__")
         or hasattr(type(converted), "__getitem__")
     ):
