@@ -1,5 +1,4 @@
 import pytest
-import pickle
 import six
 
 import slotted
@@ -60,16 +59,6 @@ def test_non_slotted():
 
     with pytest.raises(TypeError):
         type("NonSlotted", (NonSlotted, slotted.SlottedABC), {})
-
-
-def test_pickle():
-    bar = ForcedBar()
-    bar.foo = 1
-    bar.bar = 2
-
-    pickled_bar = pickle.loads(pickle.dumps(bar))
-    assert pickled_bar.foo == 1
-    assert pickled_bar.bar == 2
 
 
 if __name__ == "__main__":

@@ -12,7 +12,6 @@ from slotted import _abc as slotted_abc  # noqa
 from slotted._abc import __all__ as slotted_abc_all  # noqa
 from slotted._slotted import Slotted, SlottedMeta  # noqa
 
-
 collections_all = getattr(collections_abc, "__all__")
 
 T = tippo.TypeVar("T")

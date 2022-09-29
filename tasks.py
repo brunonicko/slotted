@@ -1,9 +1,31 @@
-from invoke import task  # type: ignore
+import os
+import shutil
+
+from invoke import task  # type: ignore  # noqa
 
 
 @task
-def docs(c):
-    c.run("sphinx-build -M html ./docs/source ./docs/build")
+def conform(c):
+    c.run("isort slotted tests ./docs/source/conf.py setup.py tasks.py -m 3 -l 88 --up --tc --lbt 0 --color")
+    c.run("black slotted --line-length=120")
+    c.run("black tests --line-length=120")
+    c.run("black setup.py --line-length=120")
+    c.run("black tasks.py --line-length=120")
+
+
+@task
+def lint(c):
+    c.run("flake8 slotted --count --select=E9,F63,F7,F82 --show-source --statistics")
+    c.run("flake8 tests --count --select=E9,F63,F7,F82 --show-source --statistics")
+    c.run(
+        "flake8 slotted --count --ignore=F811,F405,F403,F401,E203,E731,C901,W503 " "--max-line-length=120 --statistics"
+    )
+    c.run("flake8 tests --count --ignore=F811,F405,F403,F401,E203,E731,C901,W503 " "--max-line-length=120 --statistics")
+
+
+@task
+def mypy(c):
+    c.run("mypy slotted")
 
 
 @task
@@ -13,39 +35,31 @@ def tests(c):
 
 
 @task
-def tox(c):
-    c.run("tox")
+def docs(c):
+    api_docs = "./docs/source/api"
+    if os.path.exists(api_docs):
+        assert os.path.isdir(api_docs), "not a directory: {!r}".format(api_docs)
+        shutil.rmtree(api_docs)
+    os.mkdir(api_docs)
+    c.run("sphinx-apidoc slotted --separate --module-first --no-toc --force --output-dir {}".format(api_docs))
 
+    for root, dirs, files in os.walk(api_docs, topdown=False):
+        for name in files:
+            file_path = os.path.join(root, name)
+            if file_path.endswith(".rst"):
+                with open(file_path, "rb") as open_file:
+                    content = open_file.read()
+                content = content.replace(b"\r\n", b"\n")
+                with open(file_path, "wb") as open_file:
+                    open_file.write(content)
 
-@task
-def mypy(c):
-    c.run("mypy slotted")
-
-
-@task
-def lint(c):
-    c.run("flake8 slotted --count --select=E9,F63,F7,F82 --show-source --statistics")
-    c.run("flake8 tests --count --select=E9,F63,F7,F82 --show-source --statistics")
-    c.run(
-        "flake8 slotted --count --ignore=F403,F401,E203,E731,C901,W503 "
-        "--max-line-length=120 --statistics"
-    )
-    c.run(
-        "flake8 tests --count --ignore=F403,F401,E203,E731,C901,W503 "
-        "--max-line-length=120 --statistics"
-    )
-
-
-@task
-def black(c):
-    c.run("black slotted --line-length=120")
-    c.run("black tests --line-length=120")
+    c.run("sphinx-build -M html ./docs/source ./docs/build")
 
 
 @task
 def checks(c):
-    black(c)
+    conform(c)
     lint(c)
     mypy(c)
-    tox(c)
+    tests(c)
     docs(c)

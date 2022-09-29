@@ -1,5 +1,18 @@
-Slotted
-=======
+.. logo_start
+.. raw:: html
+
+   <p align="center">
+     <a href="https://github.com/brunonicko/slotted">
+         <picture>
+            <object data="./_static/slotted.svg" type="image/png">
+                <source srcset="./docs/source/_static/slotted_white.svg" media="(prefers-color-scheme: dark)">
+                <img src="./docs/source/_static/slotted.svg" width="60%" alt="slotted" />
+            </object>
+         </picture>
+     </a>
+   </p>
+.. logo_end
+
 .. image:: https://github.com/brunonicko/slotted/workflows/MyPy/badge.svg
    :target: https://github.com/brunonicko/slotted/actions?query=workflow%3AMyPy
 
@@ -21,7 +34,9 @@ Slotted
 .. image:: https://img.shields.io/pypi/pyversions/slotted?color=light-green&style=flat
    :target: https://pypi.org/project/slotted/
 
-Enforces usage of ``__slots__`` for python classes and provides pickling capabilities.
+Overview
+--------
+`slotted` enforces usage of ``__slots__`` for Python classes.
 
 Examples
 --------
@@ -82,3 +97,23 @@ raised.
     >>> foo.bar = 1
     Traceback (most recent call last):
     AttributeError: 'Foo' object has no attribute 'bar'
+
+abc
+^^^
+`slotted` also provides generic versions of the `collection.abc` classes.
+
+.. code:: python
+
+    >>> from typing import TypeVar
+    >>> from slotted import SlottedMapping, SlottedSequence, SlottedSet
+    >>> KT = TypeVar("KT")
+    >>> VT = TypeVar("VT")
+    >>> class MyMapping(SlottedMapping[KT, VT]):
+    ...     pass # implicit declaration of __slots__ = ()
+    ...
+    >>> class MySequence(SlottedSequence[VT]):
+    ...     pass # implicit declaration of __slots__ = ()
+    ...
+    >>> class MySet(SlottedSet[VT]):
+    ...     pass # implicit declaration of __slots__ = ()
+    ...

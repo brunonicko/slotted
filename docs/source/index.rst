@@ -1,17 +1,22 @@
-Welcome to Slotted documentation!
-=================================
+Introduction
+============
+
+.. include:: ../../README.rst
 
 .. toctree::
-   :maxdepth: 2
+   :hidden:
 
-   readme
+   self
+
+Documentation
+=============
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
-   api
+   api/slotted
 
-Indices and tables
+Indices and Tables
 ==================
 
 * :ref:`genindex`

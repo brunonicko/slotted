@@ -1,17 +1,18 @@
 import abc
-import tippo
-import six
 import types
+
+import six
+import tippo
 
 try:
     import collections.abc as collections_abc
 except ImportError:
     import collections as collections_abc  # type: ignore
 
-from tippo import Any, GenericMeta, Generic, Dict, List, Set, Tuple, Type, Union
-from basicco.mangling import mangle
+from tippo import Any, Dict, Generic, GenericMeta, List, Set, Tuple, Type, Union
 
 from ._slotted import Slotted, SlottedMeta
+from ._utils import mangle as _mangle
 
 __all__ = [
     "SlottedABCMeta",
@@ -145,7 +146,7 @@ _CACHE = {
 
 def extract_dict(base):
     # type: (Type) -> Tuple[Dict[str, Any], Dict[str, Any]]
-    slots = set(mangle(slot, base.__name__) for slot in getattr(base, "__slots__", ()))
+    slots = set(_mangle(slot, base.__name__) for slot in getattr(base, "__slots__", ()))
     base_dict = {}
     overrides = {}
     for name, value in six.iteritems(base.__dict__):

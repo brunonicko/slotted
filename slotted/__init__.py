@@ -1,9 +1,9 @@
-from ._slotted import SlottedMeta, Slotted, slots
 from ._abc import (
-    SlottedABCMeta,
-    SlottedABCGenericMeta,
     SlottedABC,
+    SlottedABCGenericMeta,
+    SlottedABCMeta,
     SlottedCallable,
+    SlottedCollection,
     SlottedContainer,
     SlottedHashable,
     SlottedItemsView,
@@ -19,8 +19,8 @@ from ._abc import (
     SlottedSet,
     SlottedSized,
     SlottedValuesView,
-    SlottedCollection,
 )
+from ._slotted import Slotted, SlottedMeta, slots
 
 __all__ = [
     "SlottedMeta",
