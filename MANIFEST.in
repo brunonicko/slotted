@@ -1,6 +1,20 @@
-include LICENSE
+include LICENSE *.rst *.toml *.yml *.yaml *.ini
 include README.rst
 include requirements.txt
-include tox.ini
+include requirements_dev.txt
+graft .github
 
+# Stubs
+recursive-include src *.pyi
+recursive-include src py.typed
+
+# Tests
+include tox.ini
 recursive-include tests *.py
+
+# Documentation
+recursive-include docs *.png
+recursive-include docs *.svg
+recursive-include docs *.py
+recursive-include docs *.rst
+prune docs/_build
