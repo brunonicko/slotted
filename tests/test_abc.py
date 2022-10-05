@@ -1,13 +1,10 @@
 from abc import ABCMeta
 
-try:
-    import collections.abc as collections_abc
-except ImportError:
-    import collections as collections_abc  # type: ignore
-
 import pytest
 import tippo
+from six.moves import collections_abc
 
+import slotted
 from slotted import _abc as slotted_abc  # noqa
 from slotted._abc import __all__ as slotted_abc_all  # noqa
 from slotted._slotted import Slotted, SlottedMeta  # noqa
@@ -20,22 +17,9 @@ VT = tippo.TypeVar("VT")
 
 
 def test_import_abc():
-    import slotted
-    from slotted._abc import __all__ as _collections_all  # noqa
-
-    assert _collections_all
-    for name in _collections_all:
-        member = getattr(slotted, name)
-        if member is None:
-            assert name == "SlottedCollection"
-            with pytest.raises(ImportError):
-                try:
-                    # noinspection PyCompatibility
-                    from collections.abc import Collection  # noqa
-                except ImportError:
-                    from collections import Collection  # noqa
-        else:
-            assert getattr(slotted, name)
+    assert slotted_abc_all
+    for name in slotted_abc_all:
+        assert getattr(slotted, name)
 
 
 def test_converted():
@@ -56,7 +40,7 @@ def test_converted():
                     from collections.abc import Collection  # noqa
                 except ImportError:
                     from collections import Collection  # noqa
-            assert getattr(slotted_abc, name) is None
+            assert getattr(slotted_abc, name) is not None
             continue
 
         assert original_name in collections_all
@@ -73,7 +57,6 @@ def test_converted():
 
 def test_generics():
     generics = {
-        # slotted_abc.SlottedCallable: (),
         slotted_abc.SlottedContainer: (T,),
         slotted_abc.SlottedItemsView: (KT, VT),
         slotted_abc.SlottedIterable: (T,),
@@ -87,6 +70,7 @@ def test_generics():
         slotted_abc.SlottedSequence: (T,),
         slotted_abc.SlottedSet: (T,),
         slotted_abc.SlottedValuesView: (T,),
+        slotted_abc.SlottedCollection: (T,),
     }
     for generic_cls, type_vars in generics.items():
         assert generic_cls[type_vars]

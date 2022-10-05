@@ -24,10 +24,10 @@ with open("requirements.txt", "r") as fh:
 
 setuptools.setup(
     name="slotted",
-    version="4.1.0",
+    version="4.2.0",
     author="Bruno Nicko",
     author_email="brunonicko@gmail.com",
-    description="Collection of lower-level utilities that enhance code compatibility and validation.",
+    description="Enforces usage of '__slots__' for python classes.",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     url="https://github.com/brunonicko/slotted",

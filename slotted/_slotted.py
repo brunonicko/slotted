@@ -35,11 +35,11 @@ class Slotted(six.with_metaclass(SlottedMeta, object)):
 
 
 def slots(cls, mangled=False):
-    # type: (Type[Slotted] | SlottedMeta, bool) -> Set[str]
+    # type: (Type, bool) -> Set[str]
     """
-    Get all slot names for a slotted class.
+    Get all slot names for a class.
 
-    :param cls: Slotted class.
+    :param cls: Class.
     :param mangled: Whether to mangle the protected names.
     :return: A set of slot names.
     """
