@@ -117,3 +117,14 @@ abc
     >>> class MySet(SlottedSet[VT]):
     ...     pass # implicit declaration of __slots__ = ()
     ...
+
+For Python 2.7, `slotted` adds a `SlottedCollection` class, even though the original `Collection` is not available.
+
+.. code:: python
+
+    >>> from typing import TypeVar
+    >>> from slotted import SlottedCollection
+    >>> T = TypeVar("T")
+    >>> class MyCollection(SlottedCollection[T]):
+    ...     pass # implicit declaration of __slots__ = ()
+    ...

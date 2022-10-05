@@ -3,13 +3,19 @@ import types
 
 import six
 import tippo
-
-try:
-    import collections.abc as collections_abc
-except ImportError:
-    import collections as collections_abc  # type: ignore
-
-from tippo import Any, Dict, Generic, GenericMeta, List, Set, Tuple, Type, Union
+from six.moves import collections_abc
+from tippo import (
+    Any,
+    Dict,
+    Generic,
+    GenericMeta,
+    List,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from ._slotted import Slotted, SlottedMeta
 from ._utils import mangle as _mangle
@@ -72,6 +78,7 @@ _ABC_GENERIC = [
     "Sequence",
     "Set",
     "ValuesView",
+    "Collection",
 ]
 
 
@@ -93,13 +100,20 @@ SlottedSized = tippo.Sized
 SlottedValuesView = tippo.ValuesView
 
 
-# Try to get 'Collection' if it's available.
+# Try to get 'Collection' if it's available, make one if it's not.
 try:
-    SlottedCollection = collections_abc.Collection
+    SlottedCollection = tippo.Collection  # type: Type
 except AttributeError:
-    SlottedCollection = None  # type: ignore
-else:
-    _ABC_ALL.append("Collection")
+    assert not hasattr(collections_abc, "Collection")
+
+    # noinspection PyAbstractClass
+    class Collection(collections_abc.Sized, collections_abc.Iterable, collections_abc.Container):
+        __slots__ = ()
+
+    Collection.__module__ = collections_abc.__name__
+    SlottedCollection = Collection
+
+_ABC_ALL.append("Collection")
 
 
 class SlottedABCMeta(SlottedMeta, abc.ABCMeta):
@@ -133,10 +147,14 @@ for cls_name in _ABC_ALL:
     try:
         cls = getattr(collections_abc, cls_name)
     except AttributeError:
-        continue
+        if cls_name == "Collection":
+            cls = Collection  # noqa
+        else:
+            continue
     if not isinstance(cls, abc.ABCMeta) or not issubclass(cls, object):
         continue
     _CLASSES.add(cls)
+
 
 _CACHE = {
     object: SlottedABC,
@@ -237,14 +255,6 @@ def convert(source):
         (
             "Slotted version of :class:`{}.{}`.".format(source.__module__, source.__name__),
             "\n\n",
-            (
-                ".. note::\n"
-                "   This class is not available in some older versions of Python. "
-                "   When that's the case, `{}` will be set to `None`."
-                "\n\n"
-            ).format(target_name)
-            if source_name == "Collection"
-            else "",
             "Metaclass: :class:`slotted.SlottedABCMeta`",
             "\n\n",
             "Inherits from:\n",
@@ -304,8 +314,21 @@ for original, converted in _CONVERTED_CLASSES.items():
     ):
         continue
 
+    # Get generic original.
+    try:
+        generic_original = getattr(tippo, original.__name__)
+    except AttributeError:
+        assert original.__name__ == "Collection"
+
+        T = TypeVar("T")
+
+        # noinspection PyAbstractClass
+        class GenericCollection(Collection, Generic[T]):
+            __slots__ = ()
+
+        generic_original = GenericCollection
+
     # Convert to generic.
-    generic_original = getattr(tippo, original.__name__)
     if hasattr(generic_original, "__parameters__"):
         parameters = generic_original.__parameters__
         new_class_args = (
