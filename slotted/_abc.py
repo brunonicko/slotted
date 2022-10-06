@@ -102,7 +102,7 @@ SlottedValuesView = tippo.ValuesView
 
 # Try to get 'Collection' if it's available, make one if it's not.
 try:
-    SlottedCollection = tippo.Collection  # type: Type
+    SlottedCollection = tippo.Collection
 except AttributeError:
     assert not hasattr(collections_abc, "Collection")
 
@@ -111,7 +111,7 @@ except AttributeError:
         __slots__ = ()
 
     Collection.__module__ = collections_abc.__name__
-    SlottedCollection = Collection
+    SlottedCollection = Collection  # type: ignore
 
 _ABC_ALL.append("Collection")
 
