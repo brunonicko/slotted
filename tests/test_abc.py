@@ -6,6 +6,7 @@ from six.moves import collections_abc
 
 import slotted
 from slotted import _abc as slotted_abc  # noqa
+from slotted._abc import _MISSING_TYPES  # noqa
 from slotted._abc import __all__ as slotted_abc_all  # noqa
 from slotted._slotted import Slotted, SlottedMeta  # noqa
 
@@ -33,13 +34,8 @@ def test_converted():
         if original_name not in collections_all:
             if original_name == "ABCGenericMeta":
                 continue
-            assert original_name == "Collection"
-            with pytest.raises(ImportError):
-                try:
-                    # noinspection PyCompatibility
-                    from collections.abc import Collection  # noqa
-                except ImportError:
-                    from collections import Collection  # noqa
+            assert original_name in _MISSING_TYPES
+            assert not hasattr(collections_abc, original_name)
             assert getattr(slotted_abc, name) is not None
             continue
 
@@ -71,6 +67,7 @@ def test_generics():
         slotted_abc.SlottedSet: (T,),
         slotted_abc.SlottedValuesView: (T,),
         slotted_abc.SlottedCollection: (T,),
+        slotted_abc.SlottedReversible: (T,),
     }
     for generic_cls, type_vars in generics.items():
         assert generic_cls[type_vars]

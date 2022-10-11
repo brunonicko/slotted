@@ -36,6 +36,7 @@ __all__ = [
     "SlottedMutableMapping",
     "SlottedMutableSequence",
     "SlottedMutableSet",
+    "SlottedReversible",
     "SlottedSequence",
     "SlottedSet",
     "SlottedSized",
@@ -57,10 +58,12 @@ _ABC_ALL = [
     "MutableMapping",
     "MutableSequence",
     "MutableSet",
+    "Reversible",
     "Sequence",
     "Set",
     "Sized",
     "ValuesView",
+    "Collection",
 ]
 
 _ABC_GENERIC = [
@@ -75,6 +78,7 @@ _ABC_GENERIC = [
     "MutableMapping",
     "MutableSequence",
     "MutableSet",
+    "Reversible",
     "Sequence",
     "Set",
     "ValuesView",
@@ -100,8 +104,11 @@ SlottedSized = tippo.Sized
 SlottedValuesView = tippo.ValuesView
 
 
-# Try to get 'Collection' if it's available, make one if it's not.
+# Make missing types if they are not available.
+_MISSING_TYPES = {}  # type: dict[str, type]
+
 try:
+    getattr(collections_abc, "Collection")
     SlottedCollection = tippo.Collection
 except AttributeError:
     assert not hasattr(collections_abc, "Collection")
@@ -113,7 +120,25 @@ except AttributeError:
     Collection.__module__ = collections_abc.__name__
     SlottedCollection = Collection  # type: ignore
 
-_ABC_ALL.append("Collection")
+    _ABC_ALL.append("Collection")
+    _MISSING_TYPES["Collection"] = Collection
+
+
+try:
+    getattr(collections_abc, "Reversible")
+    SlottedReversible = tippo.Reversible
+except AttributeError:
+    assert not hasattr(collections_abc, "Reversible")
+
+    # noinspection PyAbstractClass
+    class Reversible(collections_abc.Iterable):
+        __slots__ = ()
+
+    Reversible.__module__ = collections_abc.__name__
+    SlottedReversible = Reversible  # type: ignore
+
+    _ABC_ALL.append("Reversible")
+    _MISSING_TYPES["Reversible"] = Reversible
 
 
 class SlottedABCMeta(SlottedMeta, abc.ABCMeta):
@@ -147,8 +172,8 @@ for cls_name in _ABC_ALL:
     try:
         cls = getattr(collections_abc, cls_name)
     except AttributeError:
-        if cls_name == "Collection":
-            cls = Collection  # noqa
+        if cls_name in _MISSING_TYPES:
+            cls = _MISSING_TYPES[cls_name]
         else:
             continue
     if not isinstance(cls, abc.ABCMeta) or not issubclass(cls, object):
@@ -318,15 +343,15 @@ for original, converted in _CONVERTED_CLASSES.items():
     try:
         generic_original = getattr(tippo, original.__name__)
     except AttributeError:
-        assert original.__name__ == "Collection"
+        assert original.__name__ in _MISSING_TYPES
 
         T = TypeVar("T")
 
-        # noinspection PyAbstractClass
-        class GenericCollection(Collection, Generic[T]):
-            __slots__ = ()
-
-        generic_original = GenericCollection
+        generic_original = type(
+            "Generic{}".format(original.__name__),
+            (_MISSING_TYPES[original.__name__], tippo.cast(type, Generic[T])),
+            {"__slots__": ()},
+        )
 
     # Convert to generic.
     if hasattr(generic_original, "__parameters__"):
