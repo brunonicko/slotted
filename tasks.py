@@ -1,25 +1,27 @@
 import os
 import shutil
+import inspect
+
+if not hasattr(inspect, "getargspec"):
+    inspect.getargspec = inspect.getfullargspec  # type: ignore
 
 from invoke import task  # type: ignore  # noqa
 
 
 @task
 def conform(c):
-    c.run("isort slotted tests ./docs/source/conf.py setup.py tasks.py -m 3 -l 88 --up --tc --lbt 0 --color")
+    c.run("isort slotted tests ./docs/source/conf.py setup.py -m 3 -l 88 --up --tc --lbt 0 --color")
     c.run("black slotted --line-length=120")
     c.run("black tests --line-length=120")
     c.run("black setup.py --line-length=120")
-    c.run("black tasks.py --line-length=120")
 
 
 @task
 def lint(c):
-    c.run("isort slotted tests ./docs/source/conf.py setup.py tasks.py -m 3 -l 88 --up --tc --lbt 0 --check-only")
+    c.run("isort slotted tests ./docs/source/conf.py setup.py -m 3 -l 88 --up --tc --lbt 0 --check-only")
     c.run("black slotted --line-length=120 --check")
     c.run("black tests --line-length=120 --check")
     c.run("black setup.py --line-length=120 --check")
-    c.run("black tasks.py --line-length=120 --check")
 
     c.run("flake8 slotted --count --select=E9,F63,F7,F82 --show-source --statistics")
     c.run("flake8 tests --count --select=E9,F63,F7,F82 --show-source --statistics")
