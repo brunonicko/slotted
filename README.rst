@@ -36,7 +36,16 @@
 
 Overview
 --------
-`slotted` enforces usage of ``__slots__`` for Python classes.
+Enforces usage of ``__slots__`` for Python classes.
+
+Motivation
+----------
+Besides the performance benefits, using ``__slots__`` also prevents the client code from setting attributes that were
+not initially defined for instances of classes, which usually happens by mistake especially in environments where static
+type checking is not being performed.
+
+So forcing it upon a class and its subclasses might be a desirable thing to do for classes that are part of an API, for
+example.
 
 Examples
 --------
@@ -98,8 +107,8 @@ raised.
     Traceback (most recent call last):
     AttributeError: 'Foo' object has no attribute 'bar'
 
-abc
-^^^
+collections
+^^^^^^^^^^^
 `slotted` also provides generic versions of the `collection.abc` classes.
 
 .. code:: python
