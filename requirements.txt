@@ -1,2 +1,2 @@
 six
-tippo>=3.4,<4
+tippo>=4,<5

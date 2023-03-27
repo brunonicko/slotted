@@ -5,8 +5,15 @@
      <a href="https://github.com/brunonicko/slotted">
          <picture>
             <object data="./_static/slotted.svg" type="image/png">
-                <source srcset="./docs/source/_static/slotted_white.svg" media="(prefers-color-scheme: dark)">
-                <img src="./docs/source/_static/slotted.svg" width="60%" alt="slotted" />
+                <source
+                    srcset="./docs/source/_static/slotted_white.svg"
+                    media="(prefers-color-scheme: dark)"
+                />
+                <img
+                    src="./docs/source/_static/slotted.svg"
+                    width="60%"
+                    alt="slotted"
+                />
             </object>
          </picture>
      </a>
@@ -40,17 +47,18 @@ Enforces usage of ``__slots__`` for Python classes.
 
 Motivation
 ----------
-Besides the performance benefits, using ``__slots__`` also prevents the client code from setting attributes that were
-not initially defined for instances of classes, which usually happens by mistake especially in environments where static
-type checking is not being performed.
+Besides the performance benefits, using ``__slots__`` also prevents the client code from
+setting attributes that were not initially defined for instances of classes, which
+usually happens by mistake especially in environments where static type checking is not
+being performed.
 
-So forcing it upon a class and its subclasses might be a desirable thing to do for classes that are part of an API, for
-example.
+So forcing it upon a class and its subclasses might be a desirable thing to do for
+classes that are part of an API, for example.
 
 Examples
 --------
-When defining a ``Slotted`` class with no ``__slots__`` declaration, it assumes it has empty slots, which is equivalent
-to declaring ``__slots__ = ()``.
+When defining a ``Slotted`` class with no ``__slots__`` declaration, it assumes it has
+empty slots, which is equivalent to declaring ``__slots__ = ()``.
 
 .. code:: python
 
@@ -64,33 +72,34 @@ to declaring ``__slots__ = ()``.
     Traceback (most recent call last):
     AttributeError: 'Foo' object has no attribute 'bar'
 
-Slotted classes can be mixed with regular classes as long as they and all of their bases implement ``__slots__``.
+Slotted classes can be mixed with regular classes as long as they and all of their bases
+implement ``__slots__``.
 
 .. code:: python
 
     >>> from slotted import Slotted
 
-    >>> class Bar:
+    >>> class Bar(object):
     ...     __slots__ = ("bar",)
     >>> class Foo(Bar, Slotted):
     ...     __slots__ = ("foo",)
     ...
     >>> foo = Foo()
 
-If any non-``Slotted`` class anywhere in the chain does not implement ``__slots__``, a ``TypeError`` exception is
-raised.
+If any non-``Slotted`` class anywhere in the chain does not implement ``__slots__``, a
+``TypeError`` exception is raised.
 
 .. code:: python
 
     >>> from slotted import Slotted
     
-    >>> class Bar:
+    >>> class Bar(object):
     ...     pass
     >>> class Foo(Bar, Slotted):
     ...     __slots__ = ("foo",)
     ...
     Traceback (most recent call last):
-    TypeError: base 'Bar' does not define __slots__
+    TypeError: base 'Bar' is not slotted
 
 ``Slotted`` behavior can also be achieved by using the ``SlottedMeta`` metaclass.
 
@@ -106,34 +115,3 @@ raised.
     >>> foo.bar = 1
     Traceback (most recent call last):
     AttributeError: 'Foo' object has no attribute 'bar'
-
-collections
-^^^^^^^^^^^
-`slotted` also provides generic versions of the `collection.abc` classes.
-
-.. code:: python
-
-    >>> from typing import TypeVar
-    >>> from slotted import SlottedMapping, SlottedSequence, SlottedSet
-    >>> KT = TypeVar("KT")
-    >>> VT = TypeVar("VT")
-    >>> class MyMapping(SlottedMapping[KT, VT]):
-    ...     pass # implicit declaration of __slots__ = ()
-    ...
-    >>> class MySequence(SlottedSequence[VT]):
-    ...     pass # implicit declaration of __slots__ = ()
-    ...
-    >>> class MySet(SlottedSet[VT]):
-    ...     pass # implicit declaration of __slots__ = ()
-    ...
-
-For Python 2.7, `slotted` adds a `SlottedCollection` class, even though the original `Collection` is not available.
-
-.. code:: python
-
-    >>> from typing import TypeVar
-    >>> from slotted import SlottedCollection
-    >>> T = TypeVar("T")
-    >>> class MyCollection(SlottedCollection[T]):
-    ...     pass # implicit declaration of __slots__ = ()
-    ...
