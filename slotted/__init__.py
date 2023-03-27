@@ -1,7 +1,7 @@
 import inspect
 
 import six
-from tippo import Set
+from tippo import Any, Dict, Set, Tuple, Type, TypeVar
 
 __all__ = ["SlottedMeta", "Slotted", "slots"]
 
@@ -10,7 +10,15 @@ class SlottedMeta(type):
     """Metaclass that enforces `__slots__`."""
 
     @staticmethod
-    def __new__(mcs, name, bases, dct, **kwargs):
+    def __new__(
+        mcs,  # type: Type[SM]
+        name,  # type: str
+        bases,  # type: Tuple[Type[Any], ...]
+        dct,  # type: Dict[str, Any]
+        **kwargs  # type: Any
+    ):
+        # type: (...) -> SM
+
         # All bases are required to inherit from object and to have slots.
         for base in bases:
             if not issubclass(base, object):
@@ -26,6 +34,9 @@ class SlottedMeta(type):
             dct["__slots__"] = ()
 
         return super(SlottedMeta, mcs).__new__(mcs, name, bases, dct, **kwargs)
+
+
+SM = TypeVar("SM", bound=SlottedMeta)
 
 
 class Slotted(six.with_metaclass(SlottedMeta, object)):
