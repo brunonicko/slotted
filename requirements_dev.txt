@@ -8,3 +8,5 @@ sphinx
 sphinx_rtd_theme
 tox
 types-six
+types-invoke
+types-setuptools

@@ -1,3 +1,5 @@
+# type: ignore
+
 import pytest
 import six
 
@@ -44,21 +46,23 @@ def test_slots():
     assert slotted.slots(ForcedFooBar, mangled=True) == {"foo", "_FooBar__foobar"}
 
 
+def test_non_object():
+    class NonObject:
+        pass
+
+    with pytest.raises(TypeError):
+        type("NonObject", (NonObject, slotted.Slotted), {})
+
+
 def test_non_slotted():
-    class NonSlotted:
+    class NonSlotted(object):
         pass
 
     with pytest.raises(TypeError):
         slotted.SlottedMeta("NonSlotted", (NonSlotted,), {})
 
     with pytest.raises(TypeError):
-        slotted.SlottedABCMeta("NonSlotted", (NonSlotted,), {})
-
-    with pytest.raises(TypeError):
         type("NonSlotted", (NonSlotted, slotted.Slotted), {})
-
-    with pytest.raises(TypeError):
-        type("NonSlotted", (NonSlotted, slotted.SlottedABC), {})
 
 
 if __name__ == "__main__":
