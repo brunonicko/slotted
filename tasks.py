@@ -1,3 +1,5 @@
+# type: ignore
+
 from invoke import task
 
 PATHS = "slotted setup.py tasks.py docs/source/conf.py tests"
@@ -25,7 +27,7 @@ def lint(c):
 
 @task
 def mypy(c):
-    c.run("mypy slotted")
+    c.run("mypy slotted --strict")
 
 
 @task
