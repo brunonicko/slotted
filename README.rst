@@ -115,3 +115,35 @@ If any non-``Slotted`` class anywhere in the chain does not implement ``__slots_
     >>> foo.bar = 1
     Traceback (most recent call last):
     AttributeError: 'Foo' object has no attribute 'bar'
+
+abc
+^^^
+`slotted` also provides generic versions of the `collection.abc` classes.
+
+.. code:: python
+
+    >>> from typing import TypeVar
+    >>> from slotted import SlottedMapping, SlottedSequence, SlottedSet
+    >>> KT = TypeVar("KT")
+    >>> VT = TypeVar("VT")
+    >>> class MyMapping(SlottedMapping[KT, VT]):
+    ...     pass # implicit declaration of __slots__ = ()
+    ...
+    >>> class MySequence(SlottedSequence[VT]):
+    ...     pass # implicit declaration of __slots__ = ()
+    ...
+    >>> class MySet(SlottedSet[VT]):
+    ...     pass # implicit declaration of __slots__ = ()
+    ...
+
+For Python 2.7, `slotted` adds a `SlottedCollection` class, even though the original
+`Collection` is not available.
+
+.. code:: python
+
+    >>> from typing import TypeVar
+    >>> from slotted import SlottedCollection
+    >>> T = TypeVar("T")
+    >>> class MyCollection(SlottedCollection[T]):
+    ...     pass # implicit declaration of __slots__ = ()
+    ...
