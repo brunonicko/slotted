@@ -26,7 +26,7 @@ with open("requirements.txt", "r") as fh:
 
 setuptools.setup(
     name="slotted",
-    version="5.0.1",
+    version="5.1.0",
     author="Bruno Nicko",
     author_email="brunonicko@gmail.com",
     description="Enforces usage of '__slots__' for python classes.",
